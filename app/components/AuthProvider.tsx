@@ -16,7 +16,7 @@ export default function AuthProvider({
   return (
     <SessionProvider session={session}>
       {children}
-      <ToastContainer position="bottom-right" />
+      <ToastContainer position="bottom-right" limit={1} />
     </SessionProvider>
   );
 }

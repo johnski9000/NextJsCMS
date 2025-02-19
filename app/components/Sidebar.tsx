@@ -6,38 +6,38 @@ import { signOut } from "next-auth/react";
 import { FaPlus, FaEdit, FaSignOutAlt, FaBars } from "react-icons/fa";
 import { SidebarEditScreen } from "./SidebarEditScreen";
 
-function Sidebar({ slug }) {
+function Sidebar({ slug, initialPageData }) {
   const [opened, { open, close }] = useDisclosure(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [selectedElement, setSelectedElement] = useState(null);
-  const [pages, setPages] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [pages, setPages] = useState(initialPageData || []);
+  const [loading, setLoading] = useState(false);
 
-  // Example list of pages/elements
+  // Function to refresh the Sidebar data
+  const refreshSidebar = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch("http://localhost:3001/api/pages/all", {
+        cache: "no-store",
+      });
 
-  useEffect(() => {
-    async function fetchElements() {
-      try {
-        const response = await fetch("http://localhost:3001/api/pages/all"); // Adjust API endpoint if needed
-        if (!response.ok) throw new Error("Failed to fetch elements");
-
-        const data = await response.json();
-        const sanitizedObjects = data.map((page) => {
-          const { key, value } = page;
-          return { key, value: JSON.parse(value) };
-        });
-        console.log(sanitizedObjects);
-        setPages(sanitizedObjects);
-      } catch (error) {
-        console.error("Error fetching elements:", error);
-      } finally {
-        setLoading(false);
+      if (response.ok) {
+        const updatedData = await response.json();
+        setPages(
+          updatedData.map((page) => ({
+            key: page.key,
+            value: JSON.parse(page.value),
+          }))
+        );
       }
+    } catch (error) {
+      console.error("Error refreshing sidebar:", error);
+    } finally {
+      setLoading(false);
     }
+  };
 
-    fetchElements();
-  }, []);
   return (
     <>
       {/* Floating Menu Button */}
@@ -111,7 +111,11 @@ function Sidebar({ slug }) {
 
         {/* Content Area (Scrollable if needed) */}
         <div className="max-h-[400px] overflow-y-auto p-2">
-          <SidebarEditScreen selectedElement={selectedElement} slug={slug} />
+          <SidebarEditScreen
+            selectedElement={selectedElement}
+            slug={slug}
+            refreshSidebar={refreshSidebar} // Pass refresh function
+          />
         </div>
       </Modal>
 

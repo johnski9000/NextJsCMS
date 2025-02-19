@@ -5,6 +5,7 @@ import ImageBanner from "./Banners/ImageBanner";
 const ComponentMap = {
   BannerCentered: {
     component: BannerCentered,
+    name: "Banner Centered",
     metadata: {
       props: {
         title: { type: "string", default: "Explore the World" },
@@ -24,6 +25,8 @@ const ComponentMap = {
   },
   TextBanner: {
     component: TextBanner,
+    name: "Text Banner",
+
     metadata: {
       props: {
         overTitle: { type: "string", default: "Special Offer" },
@@ -40,6 +43,7 @@ const ComponentMap = {
   },
   ImageBanner: {
     component: ImageBanner,
+    name: "Image Banner",
     metadata: {
       props: {
         banner: {

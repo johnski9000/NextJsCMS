@@ -11,14 +11,18 @@ import { PropsEditor } from "./PropsEditor";
 import { SavePage } from "../utils/savePage";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+import { FaDeleteLeft } from "react-icons/fa6";
+import AddComponent from "./AdminSidebar/AddComponent";
 interface SidebarEditScreenProps {
   selectedElement: any;
   slug: string;
+  refreshSidebar: () => void;
 }
 
 export function SidebarEditScreen({
   selectedElement,
   slug,
+  refreshSidebar,
 }: SidebarEditScreenProps) {
   const parsedValue = selectedElement?.value
     ? selectedElement.value
@@ -29,6 +33,7 @@ export function SidebarEditScreen({
     parsedValue.components || []
   );
   const [editingComponent, setEditingComponent] = useState(null);
+  const [addingComponent, setAddingComponent] = useState(false);
   const [editValues, setEditValues] = useState({});
   const [dragging, setDragging] = useState(true); // Trac
   const router = useRouter();
@@ -41,11 +46,6 @@ export function SidebarEditScreen({
       handleSaveEdit(state);
     }
   }, [state]);
-
-  // Handle Cancel (Reverts back to original state)
-  const handleCancel = () => {
-    handlers.setState(originalState);
-  };
 
   // Handle Save after Editing
   const handleSaveEdit = async (updatedProps: any) => {
@@ -110,6 +110,33 @@ export function SidebarEditScreen({
     }
   };
 
+  const handleDelete = async ({ index }: { index: number }) => {
+    try {
+      const savedItems = state.filter((_, i) => i !== index);
+
+      // Ensure selectedPage is valid
+      const selectedPage = selectedElement?.key;
+      if (!selectedPage) {
+        console.error("No selected page to save.");
+        return;
+      }
+      // Save the page data
+      const response = await SavePage({
+        selectedPage,
+        savedItems,
+      });
+
+      if (response?.success) {
+        console.log("Page saved successfully.");
+        refreshSidebar();
+      } else {
+        console.error("Failed to save page:", response);
+      }
+    } catch (error) {
+      console.error("Error while saving page:", error);
+    }
+    toast("Deleted successfully!");
+  };
   // Edit Screen UI
   if (editingComponent) {
     console.log(state[editingComponent.index]);
@@ -133,7 +160,7 @@ export function SidebarEditScreen({
     return (
       <div className="p-4 space-y-4">
         <div className="flex items-center">
-          <Button variant="subtle" onClick={() => setEditingComponent(null)}>
+          <Button variant="light" onClick={() => setEditingComponent(null)}>
             <FaArrowLeft /> Back
           </Button>
         </div>
@@ -151,7 +178,19 @@ export function SidebarEditScreen({
       </div>
     );
   }
-
+  function handleAdd() {
+    setAddingComponent(true);
+  }
+  if (addingComponent) {
+    return (
+      <AddComponent
+        setAddingComponent={setAddingComponent}
+        state={state}
+        selectedPage={selectedElement?.key}
+        router={router}
+      />
+    );
+  }
   return (
     <div className="flex flex-col !overflow-hidden">
       <DragDropContext
@@ -190,19 +229,34 @@ export function SidebarEditScreen({
                         <Text>{item.component}</Text>
                       </div>
                       <div className="absolute right-[40px]">
-                        <Tooltip
-                          label={`Edit ${item.component}`}
-                          position="left"
-                        >
-                          <Button
-                            onClick={() => {
-                              setEditingComponent({ ...item, index });
-                              setEditValues({ component: item.component });
-                            }}
+                        <div className="flex gap-2">
+                          <Tooltip
+                            label={`Edit ${item.component}`}
+                            position="left"
                           >
-                            <FaEdit />
-                          </Button>
-                        </Tooltip>
+                            <Button
+                              onClick={() => {
+                                setEditingComponent({ ...item, index });
+                              }}
+                            >
+                              <FaEdit />
+                            </Button>
+                          </Tooltip>
+                          <Tooltip
+                            label={`Delete ${item.component}`}
+                            position="left"
+                          >
+                            <Button
+                              variant="light"
+                              color="red"
+                              onClick={() => {
+                                handleDelete({ index });
+                              }}
+                            >
+                              <FaDeleteLeft />
+                            </Button>
+                          </Tooltip>
+                        </div>
                       </div>
                     </div>
                   )}
@@ -212,17 +266,10 @@ export function SidebarEditScreen({
             </div>
           )}
         </Droppable>
+        <Button fullWidth mt="md" variant="outline" onClick={() => handleAdd()}>
+          Add New Element
+        </Button>{" "}
       </DragDropContext>
-
-      {/* Buttons */}
-      <div className="mt-4 flex justify-between space-x-2">
-        <Button variant="outline" color="gray" onClick={handleCancel}>
-          Cancel
-        </Button>
-        <Button color="blue" onClick={() => handleSaveEdit(state)}>
-          Update
-        </Button>
-      </div>
     </div>
   );
 }

@@ -6,7 +6,7 @@ import { signOut } from "next-auth/react";
 import { FaPlus, FaEdit, FaSignOutAlt, FaBars } from "react-icons/fa";
 import { SidebarEditScreen } from "./SidebarEditScreen";
 
-function Sidebar({ refreshPage }) {
+function Sidebar({ slug }) {
   const [opened, { open, close }] = useDisclosure(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [addModalOpen, setAddModalOpen] = useState(false);
@@ -111,10 +111,7 @@ function Sidebar({ refreshPage }) {
 
         {/* Content Area (Scrollable if needed) */}
         <div className="max-h-[400px] overflow-y-auto p-2">
-          <SidebarEditScreen
-            selectedElement={selectedElement}
-            refreshPage={refreshPage}
-          />
+          <SidebarEditScreen selectedElement={selectedElement} slug={slug} />
         </div>
       </Modal>
 

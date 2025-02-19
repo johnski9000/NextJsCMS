@@ -10,15 +10,15 @@ import ComponentMap from "./ComponentMap";
 import { PropsEditor } from "./PropsEditor";
 import { SavePage } from "../utils/savePage";
 import { toast } from "react-toastify";
-
+import { useRouter } from "next/navigation";
 interface SidebarEditScreenProps {
   selectedElement: any;
-  refreshPage: Function;
+  slug: string;
 }
 
 export function SidebarEditScreen({
   selectedElement,
-  refreshPage,
+  slug,
 }: SidebarEditScreenProps) {
   const parsedValue = selectedElement?.value
     ? selectedElement.value
@@ -31,6 +31,7 @@ export function SidebarEditScreen({
   const [editingComponent, setEditingComponent] = useState(null);
   const [editValues, setEditValues] = useState({});
   const [dragging, setDragging] = useState(true); // Trac
+  const router = useRouter();
   useEffect(() => {
     setOriginalState(parsedValue.components || []);
     handlers.setState(parsedValue.components || []);
@@ -63,7 +64,7 @@ export function SidebarEditScreen({
 
         if (response?.success) {
           console.log("Page saved successfully.");
-          refreshPage();
+          router.refresh();
         } else {
           console.error("Failed to save page:", response);
         }
@@ -98,7 +99,7 @@ export function SidebarEditScreen({
 
         if (response?.success) {
           console.log("Page saved successfully.");
-          refreshPage();
+          router.refresh();
         } else {
           console.error("Failed to save page:", response);
         }

@@ -1,60 +1,42 @@
-"use client";
-
-import React, { useEffect, useState, useCallback } from "react";
+// app/[slug]/page.tsx
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import ComponentMap from "../components/ComponentMap";
-import { getSession } from "@/auth";
 import Sidebar from "../components/Sidebar";
-import { useSession } from "next-auth/react";
+import RefreshBoundary from "../components/RefreshBoundary"; // NEW
 
-export default function Page({ params }) {
-  const { slug } = React.use(params);
-  const [pageData, setPageData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const { data: session, status } = useSession();
-  // Fetch page data dynamically
-  const fetchPageData = useCallback(async () => {
-    setLoading(true);
-    try {
-      const response = await fetch(`http://localhost:3001/api/pages/${slug}`);
+// Fetch page data on request
+async function getPageData(slug: string) {
+  const response = await fetch(`http://localhost:3001/api/pages/${slug}`, {
+    cache: "no-store", // Ensure fresh data
+  });
 
-      if (!response.ok) {
-        setPageData(null);
-        return;
-      }
+  if (!response.ok) return null;
+  return response.json();
+}
 
-      const data = await response.json();
-      setPageData(data);
-    } catch (error) {
-      console.error("Error fetching page data:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, [slug]);
+export default async function Page({ params }) {
+  const { slug } = params;
+  const pageData = await getPageData(slug);
 
-  // Run fetchPageData on mount
-  useEffect(() => {
-    fetchPageData();
-  }, [fetchPageData]);
-
-  if (loading) return <div>Loading...</div>;
   if (!pageData) return notFound();
 
   return (
-    <main className="flex">
-      {session && <Sidebar refreshPage={fetchPageData} />}
-      <div className="flex flex-col w-full">
-        {pageData?.components.map((component, index) => {
-          const ComponentEntry = ComponentMap[component.component];
-          const { props } = component;
-          if (!ComponentEntry) return null;
+    <RefreshBoundary>
+      <main className="flex">
+        {/* Wrap in RefreshBoundary to enable refetching */}
 
-          const { component: Component } = ComponentEntry;
+        <Sidebar slug={slug} />
+        <div className="flex flex-col w-full">
+          {pageData.components.map((component, index) => {
+            const ComponentEntry = ComponentMap[component.component];
+            if (!ComponentEntry) return null;
 
-          return <Component key={index} {...props} />;
-        })}
-        <div className="text-black">asdad</div>
-      </div>
-    </main>
+            const { component: Component } = ComponentEntry;
+            return <Component key={index} {...component.props} />;
+          })}
+        </div>
+      </main>{" "}
+    </RefreshBoundary>
   );
 }

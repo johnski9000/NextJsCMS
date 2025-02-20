@@ -19,6 +19,8 @@ function AddComponent({ setAddingComponent, state, selectedPage, slug }) {
 
   const handleAddComponent = async (componentKey: string) => {
     try {
+      console.log("Adding component:", componentKey);
+      console.log("Current state:", state);
       const newComponent = { component: componentKey, props: {} };
       const mergedState = [...state, newComponent];
 

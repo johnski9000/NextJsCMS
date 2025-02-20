@@ -29,7 +29,7 @@ function Sidebar({ slug, initialPageData }) {
     setLoading(true);
     try {
       const response = await fetch(
-        `${process.env.NEXTAUTH_URL}/api/pages/all`,
+        `${process.env.NEXT_PUBLIC_URL}/api/pages/all`,
         {
           cache: "no-store",
         }

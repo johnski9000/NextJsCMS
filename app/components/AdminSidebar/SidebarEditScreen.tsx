@@ -33,10 +33,14 @@ export function SidebarEditScreen({
   const [addingComponent, setAddingComponent] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-
+  console.log("selectedElement", selectedElement);
+  console.log("parsedValue", parsedValue);
+  console.log("state", state);
   useEffect(() => {
-    handlers.setState(parsedValue.components || []);
-  }, [selectedElement]);
+    if (Array.isArray(parsedValue.components)) {
+      handlers.setState(parsedValue.components);
+    }
+  }, [selectedElement, parsedValue.components]);
 
   /** Save page data after editing */
   const handleSaveEdit = async (updatedProps, file) => {
@@ -103,13 +107,14 @@ export function SidebarEditScreen({
     try {
       setLoading(true);
       const response = await fetch(
-        `${process.env.NEXTAUTH_URL}/api/pages/${slug}`,
+        `${process.env.NEXT_PUBLIC_URL}/api/pages/${slug}`,
         {
           cache: "no-store",
         }
       );
       if (response.ok) {
         const updatedData = await response.json();
+        console.log("Updated Data:", updatedData);
         handlers.setState(updatedData.components || []);
       }
     } catch (error) {
@@ -195,6 +200,7 @@ export function SidebarEditScreen({
 
   /** UI for Adding a Component */
   if (addingComponent) {
+    console.log("state", state);
     return (
       <AddComponent
         setAddingComponent={setAddingComponent}

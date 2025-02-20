@@ -1,14 +1,17 @@
 // app/[slug]/page.tsx
 import { notFound } from "next/navigation";
 import ComponentMap from "../components/ComponentMap";
-import Sidebar from "../components/Sidebar";
+import Sidebar from "../components/AdminSidebar/Sidebar";
 import RefreshBoundary from "../components/RefreshBoundary";
 
 // Fetch page data on request
 async function getPageData(slug: string) {
-  const response = await fetch(`http://localhost:3001/api/pages/${slug}`, {
-    cache: "no-store",
-  });
+  const response = await fetch(
+    `${process.env.NEXTAUTH_URL}/api/pages/${slug}`,
+    {
+      cache: "no-store",
+    }
+  );
 
   if (!response.ok) return null;
   return response.json();
@@ -16,7 +19,7 @@ async function getPageData(slug: string) {
 
 // Fetch all pages
 async function getAllPageData() {
-  const response = await fetch("http://localhost:3001/api/pages/all");
+  const response = await fetch(`${process.env.NEXTAUTH_URL}/api/pages/all`);
 
   if (!response.ok) return null;
   const data = await response.json();
@@ -39,6 +42,7 @@ export default async function Page({ params }) {
         <Sidebar slug={slug} initialPageData={allPageData} />
         <div className="flex flex-col w-full">
           {pageData.components.map((component, index) => {
+            console.log("Component:", component);
             const ComponentEntry = ComponentMap[component.component];
             if (!ComponentEntry) return null;
             console.log(ComponentEntry);

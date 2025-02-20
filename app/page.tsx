@@ -1,61 +1,50 @@
-"use client";
-import { useState } from "react";
-import { ToastContainer } from "react-toastify";
+// app/[slug]/page.tsx
+import { notFound } from "next/navigation";
+import ComponentMap from "./components/ComponentMap";
+import Sidebar from "./components/AdminSidebar/Sidebar";
+import RefreshBoundary from "./components/RefreshBoundary";
 
-export default function UploadForm() {
-  const [file, setFile] = useState(null);
-  const [preview, setPreview] = useState(null);
-  const [uploading, setUploading] = useState(false);
-  const [uploadedUrl, setUploadedUrl] = useState("");
+// Fetch page data on request
+async function getPageData() {
+  const response = await fetch(`${process.env.NEXTAUTH_URL}/api/pages/home`, {
+    cache: "no-store",
+  });
 
-  const handleFileChange = (event) => {
-    const selectedFile = event.target.files[0];
-    setFile(selectedFile);
-    setPreview(URL.createObjectURL(selectedFile));
-  };
+  if (!response.ok) return null;
+  return response.json();
+}
 
-  const handleUpload = async () => {
-    if (!file) return alert("Please select a file");
+// Fetch all pages
+async function getAllPageData() {
+  const response = await fetch(`${process.env.NEXTAUTH_URL}/api/pages/all`);
 
-    setUploading(true);
-    const formData = new FormData();
-    formData.append("file", file);
+  if (!response.ok) return null;
+  const data = await response.json();
+  return data.map((page) => ({
+    key: page.key,
+    value: JSON.parse(page.value),
+  }));
+}
 
-    try {
-      const res = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
+export default async function Page() {
+  const pageData = await getPageData();
+  const allPageData = await getAllPageData();
 
-      const data = await res.json();
-      if (data.success) {
-        setUploadedUrl(data.url);
-      } else {
-        alert("Upload failed");
-      }
-    } catch (error) {
-      alert("Upload error: " + error.message);
-    } finally {
-      setUploading(false);
-    }
-  };
+  if (!pageData) return notFound();
 
   return (
-    <div>
-      <input type="file" onChange={handleFileChange} />
-      {preview && <img src={preview} alt="Preview" width={200} />}
-      <button onClick={handleUpload} disabled={uploading}>
-        {uploading ? "Uploading..." : "Upload"}
-      </button>
-      {uploadedUrl && (
-        <p>
-          ✅ Uploaded:{" "}
-          <a href={uploadedUrl} target="_blank">
-            {uploadedUrl}
-          </a>
-        </p>
-      )}
-      <ToastContainer />
-    </div>
+    <RefreshBoundary>
+      <main className="flex">
+        <Sidebar slug={"home"} initialPageData={allPageData} />
+        <div className="flex flex-col w-full">
+          {pageData?.components?.map((component, index) => {
+            const ComponentEntry = ComponentMap[component.component];
+            if (!ComponentEntry) return null;
+            const { component: Component } = ComponentEntry;
+            return <Component key={index} {...component.props} />;
+          })}
+        </div>
+      </main>
+    </RefreshBoundary>
   );
 }

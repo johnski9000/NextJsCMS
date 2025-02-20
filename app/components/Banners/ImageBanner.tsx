@@ -14,7 +14,7 @@ interface BannerProps {
 }
 
 const defaultBanner: BannerProps = {
-  banner: "/default-banner.jpg",
+  banner: "https://readymadeui.com/cardImg.webp",
   alt: "Default banner image",
   main: true,
   title: "Welcome to Our Website",

@@ -4,25 +4,24 @@ import React, { useState } from "react";
 import { FaArrowLeft, FaEye } from "react-icons/fa";
 import ComponentMap from "../ComponentMap";
 import { SavePage } from "@/app/utils/savePage";
+import { useRouter } from "next/navigation";
 
-function AddComponent({ setAddingComponent, state, selectedPage, router }) {
-  const [previewComponent, setPreviewComponent] = useState(null);
+function AddComponent({ setAddingComponent, state, selectedPage, slug }) {
+  const [previewComponent, setPreviewComponent] = useState<React.FC | null>(
+    null
+  );
   const [previewOpen, setPreviewOpen] = useState(false);
-  console.log("state", state);
-  const handlePreview = (Component) => {
-    setPreviewComponent(() => Component); // Store component reference properly
+  const router = useRouter();
+  const handlePreview = (Component: React.FC) => {
+    setPreviewComponent(() => Component); // Properly store the component reference
     setPreviewOpen(true);
   };
-  const handleAddComponent = async (Component) => {
-    console.log("Adding component:", Component);
+
+  const handleAddComponent = async (componentKey: string) => {
     try {
-      const mergedState = [
-        ...state,
-        {
-          component: Component.name.replace(/\s/g, ""),
-        },
-      ];
-      console.log("mergedState", mergedState);
+      const newComponent = { component: componentKey, props: {} };
+      const mergedState = [...state, newComponent];
+
       const response = await SavePage({
         selectedPage,
         savedItems: mergedState,
@@ -38,6 +37,7 @@ function AddComponent({ setAddingComponent, state, selectedPage, router }) {
       console.error("Error adding component:", error);
     }
   };
+
   return (
     <div className="p-4 space-y-4">
       <div className="flex items-center">
@@ -49,11 +49,8 @@ function AddComponent({ setAddingComponent, state, selectedPage, router }) {
       <Divider />
 
       {/* List of Components */}
-      {Object.keys(ComponentMap).map((comp, index) => {
-        console.log(comp);
-        const { component: Component, name, metadata } = ComponentMap[comp];
-
-        return (
+      {Object.entries(ComponentMap).map(
+        ([compKey, { component: Component, name }], index) => (
           <div key={index} className="flex justify-between items-center p-2">
             <Text>{name}</Text>
             <div className="flex space-x-2">
@@ -62,33 +59,30 @@ function AddComponent({ setAddingComponent, state, selectedPage, router }) {
                 <FaEye />
               </Button>
               {/* Add Button */}
-              <Button
-                size="xs"
-                onClick={() => handleAddComponent(ComponentMap[comp])}
-              >
+              <Button size="xs" onClick={() => handleAddComponent(compKey)}>
                 Add
               </Button>
             </div>
           </div>
-        );
-      })}
+        )
+      )}
 
       {/* Full-Screen Preview Modal */}
       <Modal
         fullScreen
         opened={previewOpen}
         onClose={() => setPreviewOpen(false)}
+        title="Component Preview"
       >
-        <Modal.Header>
-          <div className="flex mx-auto items-center text-center space-x-2 text-lg font-semibold text-gray-800">
-            Component Preview
-          </div>
-        </Modal.Header>
-        {previewComponent ? (
-          React.createElement(previewComponent)
-        ) : (
-          <Text>No preview available</Text>
-        )}
+        <div className="flex justify-center items-center h-full">
+          {previewComponent ? (
+            <div className="h-full w-full">
+              {React.createElement(previewComponent)}
+            </div>
+          ) : (
+            <Text>No preview available</Text>
+          )}
+        </div>
       </Modal>
     </div>
   );

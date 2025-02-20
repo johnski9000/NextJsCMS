@@ -37,7 +37,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({
       success: true,
-      url: `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com/${process.env.R2_BUCKET_NAME}/${fileName}`,
+      url: `${process.env.R2_PUBLIC_BUCKET_ID}/${fileName}`,
     });
   } catch (error) {
     console.error("Upload Error:", error);

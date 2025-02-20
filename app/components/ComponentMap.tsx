@@ -16,7 +16,7 @@ const ComponentMap = {
         imageUrl: {
           type: "string",
           format: "image",
-          default: "/images/default-banner.jpg",
+          default: "https://readymadeui.com/cardImg.webp",
         }, // Image
         buttonText: { type: "string", default: "Book Now" },
         buttonLink: { type: "string", default: "#" },

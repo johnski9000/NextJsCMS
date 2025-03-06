@@ -1,14 +1,15 @@
 import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
 const WORKER_URL = "https://kv-worker.enquiries-01c.workers.dev";
 
-export async function GET(
-  req: Request,
-  { params }: { params: { slug: string } }
-) {
-  const { slug } = await params;
-
+// Fix the type definition for params
+export async function GET(req: NextRequest) {
   try {
+    const url = new URL(req.url);
+    const pathnameParts = url.pathname.split("/");
+    const slug = pathnameParts[pathnameParts.length - 1]; // Extract slug
+
     const response = await fetch(`${WORKER_URL}/api/pages/${slug}`);
 
     if (!response.ok) {
@@ -26,12 +27,10 @@ export async function GET(
   }
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
-    console.log("Request body:", req.body);
-    const { slug, pageData } = await req.json();
-    console.log("Slug:", slug);
-    console.log("Page data:", pageData);
+    const { slug, pageData } = await req.json(); // ✅ Fixed - No need for `req.body`
+
     const response = await fetch(`${WORKER_URL}/api/pages/${slug}`, {
       method: "POST",
       headers: {

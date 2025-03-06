@@ -1,76 +1,77 @@
+import { formatProps } from "@/app/utils/formatProps";
 import Link from "next/link";
 
 interface TextBannerProps {
-  overTitle?: string;
-  title?: string;
-  italic?: string;
-  description?: string;
-  alt?: string;
-  cta?: string;
-  price?: string;
+  overTitle?: { value: string; active: boolean };
+  title?: { value: string; active: boolean };
+  italic?: { value: string; active: boolean };
+  description?: { value: string; active: boolean };
+  buttonText?: { value: string; active: boolean };
+  buttonLink?: { value: string; active: boolean };
 }
 
-const defaultTextBanner: TextBannerProps = {
-  overTitle: "Special Offer",
-  title: "Discover Our",
-  italic: "Exclusive Services",
-  description:
-    "Providing top-tier web solutions tailored to your business needs.",
-  cta: "Get Started",
-  price: "Contact us for pricing",
+const defaultTextBanner: Required<TextBannerProps> = {
+  overTitle: { value: "Special Offer", active: true },
+  title: { value: "Discover Our", active: true },
+  italic: { value: "Exclusive Services", active: true },
+  description: {
+    value: "Providing top-tier web solutions tailored to your business needs.",
+    active: true,
+  },
+  buttonText: { value: "Contact Us", active: true },
+  buttonLink: { value: "/contact", active: true },
 };
 
 const TextBanner: React.FC<TextBannerProps> = (props) => {
-  const mergedProps = { ...defaultTextBanner, ...props }; // Merge default & passed props
+  const formattedProps = formatProps(props);
+  const mergedProps = { ...defaultTextBanner, ...formattedProps };
 
   return (
-    <section className="h-[93vh] relative bg-white">
+    <section className="h-[93vh] relative ">
       {/* Overlay Section */}
       <div className="absolute inset-0 flex items-center justify-center bg-gray-100 bg-opacity-80">
         <div className="content-box p-6 w-full h-full flex justify-center text-center items-center relative">
           <div className="inner flex flex-col max-w-3xl space-y-6">
             {/* Over Title */}
-            <span className="w-fit mx-auto inline-block py-1 px-3 text-xs font-semibold text-orange-900 bg-orange-50 rounded-full">
-              {mergedProps.overTitle}
-            </span>
+            {mergedProps.overTitle.active && (
+              <span className="w-fit mx-auto inline-block py-1 px-3 text-xs font-semibold text-orange-900 bg-orange-50 rounded-full">
+                {mergedProps.overTitle.value}
+              </span>
+            )}
 
             {/* Main Title */}
-            <h1 className="font-heading text-3xl xs:text-5xl md:text-6xl font-bold text-gray-900 leading-tight">
-              {mergedProps.title}{" "}
-              <span className="italic">{mergedProps.italic}</span>
-            </h1>
+            {(mergedProps.title.active || mergedProps.italic.active) && (
+              <h1 className="font-heading text-3xl xs:text-5xl md:text-6xl font-bold  leading-tight">
+                {mergedProps.title.active ? mergedProps.title.value : ""}{" "}
+                {mergedProps.italic.active && (
+                  <span className="italic">{mergedProps.italic.value}</span>
+                )}
+              </h1>
+            )}
 
             {/* Description */}
-            <p className="text-lg text-gray-600 leading-relaxed">
-              {mergedProps.description}
-            </p>
+            {mergedProps.description.active && (
+              <p className="text-lg  leading-relaxed">
+                {mergedProps.description.value}
+              </p>
+            )}
 
-            {/* CTA Buttons */}
-            <div className="link-box max-w-[400px] w-full flex flex-col justify-center items-center mx-auto gap-6 pt-8">
-              {mergedProps.cta === "Go Back Home" ? (
+            {/* CTA Button */}
+            {mergedProps.buttonText.active && (
+              <div className="link-box max-w-[400px] w-full flex flex-col justify-center items-center mx-auto gap-6 pt-8">
                 <Link
-                  href="/"
-                  className="bg-[#f99005] w-full text-center text-black rounded-md shadow-2xl px-4 py-2 tracking-widest font-bold"
+                  href={mergedProps.buttonLink.link ?? "/contact"}
+                  className={`${
+                    mergedProps.buttonText.value === "Go Back Home"
+                      ? "bg-[#f99005] "
+                      : "text-gray-300 bg-black border-gray-700 border-[1px]"
+                  } w-full text-center rounded-md shadow-2xl px-4 py-2 tracking-widest font-bold`}
+                  aria-label={mergedProps.buttonText.value}
                 >
-                  {mergedProps.cta}
+                  {mergedProps.buttonText.value}
                 </Link>
-              ) : (
-                <Link
-                  href="/contact"
-                  className="flex w-full justify-center text-gray-300 bg-black border-gray-700 border-[1px] px-4 py-2 rounded-tl-[10px] font-[500] text-sm font-mont tracking-widest hover:font-bold transition-all hover:rounded-tl-[0] hover:rounded-br-[25px]"
-                >
-                  {mergedProps.cta}
-                </Link>
-              )}
-
-              {/* Secondary CTA */}
-              <Link
-                href="/contact"
-                className="flex w-full justify-center text-gray-300 bg-black border-gray-700 border-[1px] px-4 py-2 rounded-tl-[10px] font-[500] text-sm font-mont tracking-widest hover:font-bold transition-all hover:rounded-tl-[0] hover:rounded-br-[25px]"
-              >
-                Free Consultation
-              </Link>
-            </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

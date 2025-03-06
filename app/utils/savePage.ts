@@ -1,6 +1,10 @@
-export const SavePage = async ({ selectedPage, savedItems }) => {
-  console.log("Saved Items:", savedItems);
-  console.log("Selected Page:", selectedPage);
+export const SavePage = async ({
+  selectedPage,
+  savedItems,
+}: {
+  selectedPage: string;
+  savedItems: any[];
+}) => {
   try {
     const response = await fetch("/api/pages", {
       method: "POST",
@@ -16,9 +20,8 @@ export const SavePage = async ({ selectedPage, savedItems }) => {
       throw new Error("Failed to save page");
     }
     const data = await response.json();
-    console.log("Data:", data);
     return data;
   } catch (error) {
-    return { error: error.message };
+    return { error: (error as Error).message };
   }
 };

@@ -6,21 +6,34 @@ import ComponentMap from "../ComponentMap";
 import { SavePage } from "@/app/utils/savePage";
 import { useRouter } from "next/navigation";
 
-function AddComponent({ setAddingComponent, state, selectedPage, slug }) {
+interface AddComponentProps {
+  setAddingComponent: (value: boolean) => void;
+  state: { component: string; props: Record<string, any> }[];
+  selectedPage: string;
+  slug: string;
+  handleRefresh?: () => void;
+}
+
+function AddComponent({
+  setAddingComponent,
+  state,
+  selectedPage,
+  slug,
+  handleRefresh,
+}: AddComponentProps) {
   const [previewComponent, setPreviewComponent] = useState<React.FC | null>(
     null
   );
   const [previewOpen, setPreviewOpen] = useState(false);
   const router = useRouter();
+
   const handlePreview = (Component: React.FC) => {
-    setPreviewComponent(() => Component); // Properly store the component reference
+    setPreviewComponent(() => Component); // Store the component reference
     setPreviewOpen(true);
   };
 
   const handleAddComponent = async (componentKey: string) => {
     try {
-      console.log("Adding component:", componentKey);
-      console.log("Current state:", state);
       const newComponent = { component: componentKey, props: {} };
       const mergedState = [...state, newComponent];
 
@@ -30,8 +43,8 @@ function AddComponent({ setAddingComponent, state, selectedPage, slug }) {
       });
 
       if (response?.success) {
-        console.log("Page saved successfully.");
         router.refresh();
+        handleRefresh();
       } else {
         console.error("Failed to save page:", response);
       }

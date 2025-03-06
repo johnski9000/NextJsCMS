@@ -1,4 +1,4 @@
-export const uploadImage = async (image) => {
+export const uploadImage = async (image: string | Blob) => {
   try {
     const formData = new FormData();
     formData.append("file", image);
@@ -8,7 +8,6 @@ export const uploadImage = async (image) => {
     });
 
     const data = await res.json();
-    console.log(data);
     if (data.success) {
       return data.url;
     } else {

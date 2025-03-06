@@ -6,7 +6,6 @@ export async function GET() {
   try {
     // Fetch all keys from Cloudflare KV
     const response = await fetch(`${WORKER_URL}/api/pages/all`);
-    console.log(response);
     if (!response.ok) {
       return NextResponse.json(
         { error: "Failed to fetch keys" },
@@ -15,7 +14,6 @@ export async function GET() {
     }
 
     const data = await response.json();
-    console.log(data);
     return NextResponse.json(data);
   } catch (error) {
     console.error("Error fetching all KV pairs:", error);

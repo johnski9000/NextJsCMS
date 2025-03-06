@@ -15,17 +15,27 @@ import { signOut } from "next-auth/react";
 import { FaPlus, FaEdit, FaSignOutAlt, FaBars } from "react-icons/fa";
 import { SidebarEditScreen } from "./SidebarEditScreen";
 
-function Sidebar({ slug, initialPageData }) {
+interface PageData {
+  key: string;
+  value: any;
+}
+
+interface SidebarProps {
+  slug: string;
+  initialPageData: PageData[];
+}
+
+function Sidebar({ slug, initialPageData }: SidebarProps) {
   const [opened, { open, close }] = useDisclosure(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [addModalOpen, setAddModalOpen] = useState(false);
-  const [selectedElement, setSelectedElement] = useState(null);
-  const [pages, setPages] = useState(initialPageData || []);
+  const [selectedElement, setSelectedElement] = useState<PageData | null>(null);
+  const [pages, setPages] = useState<PageData[]>(initialPageData || []);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   /** Refresh Sidebar Pages */
-  const refreshSidebar = async () => {
+  const refreshSidebar = async (): Promise<void> => {
     setLoading(true);
     try {
       const response = await fetch(
@@ -36,7 +46,7 @@ function Sidebar({ slug, initialPageData }) {
       );
 
       if (response.ok) {
-        const updatedData = await response.json();
+        const updatedData: PageData[] = await response.json();
         setPages(
           updatedData.map((page) => ({
             key: page.key,
@@ -115,15 +125,15 @@ function Sidebar({ slug, initialPageData }) {
 
         {/* Current Page Actions */}
         <div className="p-3 bg-gray-100 rounded-md shadow-sm">
-          <h4 className="text-lg font-semibold text-gray-700">Current Page</h4>
-          <p className="text-sm text-gray-500">{slug}</p>
+          <h4 className="text-lg font-semibold ">Current Page</h4>
+          <p className="text-sm ">{slug}</p>
           <Button
             fullWidth
             mt="md"
             variant="outline"
             onClick={() => {
               const currentPage = pages.find((p) => p.key === slug);
-              setSelectedElement(currentPage);
+              setSelectedElement(currentPage || null);
               setEditModalOpen(true);
             }}
             className="font-semibold mt-2"
@@ -148,26 +158,26 @@ function Sidebar({ slug, initialPageData }) {
       {/* Edit Element Modal */}
       <Modal
         centered
-        opened={editModalOpen && selectedElement}
+        opened={editModalOpen && !!selectedElement}
         onClose={() => setEditModalOpen(false)}
         title={
-          <div className="flex items-center space-x-2 text-lg font-semibold text-gray-800">
+          <div className="flex items-center space-x-2 text-lg font-semibold ">
             <FaEdit className="text-blue-600" />
             <span>Edit {selectedElement?.key}</span>
           </div>
         }
-        size="lg"
+        size="xl"
         radius="md"
         overlayProps={{ blur: 5, opacity: 0.2 }}
         transitionProps={{ transition: "pop", duration: 200 }}
         classNames={{
-          modal: "p-6 rounded-lg shadow-xl bg-white",
+          content: "p-2 rounded-lg shadow-xl ",
           body: "space-y-4",
         }}
       >
         <Divider className="mb-4" />
         {selectedElement && (
-          <div className="max-h-[400px] overflow-y-auto p-2">
+          <div className=" overflow-y-auto p-2">
             <SidebarEditScreen
               selectedElement={selectedElement}
               slug={slug}

@@ -13,6 +13,11 @@ const nextConfig: NextConfig = {
         hostname: "pub-174bad6a4f964482a3d0bb9a06f5f778.r2.dev",
         pathname: "**", // This allows all paths under the hostname
       },
+      {
+        protocol: "https",
+        hostname: "pagedone.io",
+        pathname: "**", // This allows all paths under the hostname
+      },
     ],
   },
 };

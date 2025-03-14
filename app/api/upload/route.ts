@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import {
+  S3Client,
+  PutObjectCommand,
+  DeleteObjectCommand,
+} from "@aws-sdk/client-s3";
 
 const s3 = new S3Client({
   region: "auto",
@@ -15,12 +19,31 @@ export async function POST(req: Request) {
     // Parse form data
     const formData = await req.formData();
     const file = formData.get("file");
-
+    const previousImage = formData.get("previousImage");
     if (!(file instanceof File)) {
       return NextResponse.json(
         { error: "Invalid file uploaded" },
         { status: 400 }
       );
+    }
+
+    // **🗑 Delete Previous Image if Provided**
+    if (previousImage) {
+      try {
+        const fileNameToDelete =
+          typeof previousImage === "string"
+            ? previousImage.split("/").pop()
+            : ""; // Extract file name from URL
+        const deleteParams = {
+          Bucket: process.env.R2_BUCKET_NAME,
+          Key: `nextjs-cms/${fileNameToDelete}`,
+        };
+
+        await s3.send(new DeleteObjectCommand(deleteParams));
+        console.log(`Deleted previous image: ${fileNameToDelete}`);
+      } catch (deleteError) {
+        console.error("Error deleting previous image:", deleteError);
+      }
     }
 
     // Convert File to Buffer
@@ -31,7 +54,7 @@ export async function POST(req: Request) {
     // Upload to Cloudflare R2
     const uploadParams = {
       Bucket: process.env.R2_BUCKET_NAME,
-      Key: `assets/${fileName}`, // Ensure files are saved under `/assets/`
+      Key: `nextjs-cms/${fileName}`,
       Body: buffer,
       ContentType: file.type,
     };
@@ -41,7 +64,7 @@ export async function POST(req: Request) {
     // ✅ Update the returned URL to your custom domain
     return NextResponse.json({
       success: true,
-      url: `https://cdn.setoriasecurity.co.uk/assets/${fileName}`, // Uses the custom domain
+      url: `${process.env.R2_PUBLIC_BUCKET_ID}/nextjs-cms/${fileName}`, // Uses the custom domain
     });
   } catch (error) {
     console.error("Upload Error:", error);

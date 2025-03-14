@@ -1,17 +1,11 @@
 // app/[slug]/page.tsx
 import { notFound } from "next/navigation";
-import ComponentMap from "./components/ComponentMap";
+import ComponentMap from "./components/ComponentMaps/ComponentMap";
 import Sidebar from "./components/AdminSidebar/Sidebar";
-import RefreshBoundary from "./components/RefreshBoundary";
-import Banner_Carousel from "./components/Banners/Banner_Carousel/Banner_Carousel";
-import AboutUs from "./components/AboutUs/AboutUs";
-import Features from "./components/AboutUs/Features";
-import Reviews from "./components/Reviews/Reviews";
-import FAQ from "./components/FAQ/FAQ";
-import Contact from "./components/Contact/Contact";
-import Footer from "./components/Footer/Footer";
 import { getServerSession } from "next-auth";
-import TestimonialCarousel from "./components/Reviews/Testimonials";
+import ModernNav from "./components/Navigation/ModernNav";
+import DynamicNavigation from "./components/DynamicNavigation";
+import DynamicFooter from "./components/DynamicFooter";
 
 // Fetch page data on request
 async function getPageData() {
@@ -32,7 +26,6 @@ interface PageData {
 // Fetch all pages
 async function getAllPageData(): Promise<{ key: string; value: any }[] | null> {
   const response = await fetch(`${process.env.NEXTAUTH_URL}/api/pages/all`);
-
   if (!response.ok) return null;
 
   const data: PageData[] = await response.json(); // Explicitly define type
@@ -46,29 +39,38 @@ export default async function Page() {
   const session = await getServerSession();
   const pageData = await getPageData();
   const allPageData = await getAllPageData();
+  const navigation = allPageData?.find((page) => page.key === "Navigation");
+  const footer = allPageData?.find((page) => page.key === "Footer");
 
-  if (!pageData) return notFound();
+  // if (!pageData) return notFound();
+  if (!pageData) return <div>not found</div>;
 
   return (
-    <RefreshBoundary>
-      <main className="flex">
-        {session && (
+    <main className="flex min-h-screen">
+      {session && (
+        <div className="w-[250px] h-screen fixed">
           <Sidebar slug={"home"} initialPageData={allPageData || []} />
-        )}
-        <div className="flex flex-col w-full z-40">
-          {pageData?.components?.map(
-            (
-              component: { component: keyof typeof ComponentMap; props: any },
-              index: number
-            ) => {
-              const ComponentEntry = ComponentMap[component.component];
-              if (!ComponentEntry) return null;
-              const { component: Component } = ComponentEntry;
-              return <Component key={index} {...component.props} />;
-            }
-          )}{" "}
         </div>
-      </main>
-    </RefreshBoundary>
+      )}
+      <div
+        className={`flex flex-col z-40 ${
+          session ? "ml-[250px] w-[calc(100%-250px)]" : "w-full"
+        }`}
+      >
+        {navigation && <DynamicNavigation selectedNav={navigation?.value} />}
+        {pageData?.components?.map(
+          (
+            component: { component: keyof typeof ComponentMap; props: any },
+            index: number
+          ) => {
+            const ComponentEntry = ComponentMap[component.component];
+            if (!ComponentEntry) return null;
+            const { component: Component } = ComponentEntry;
+            return <Component key={index} {...component.props} />;
+          }
+        )}
+        {footer && <DynamicFooter selectedFooter={footer?.value} />}
+      </div>
+    </main>
   );
 }

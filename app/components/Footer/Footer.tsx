@@ -2,81 +2,31 @@ import { formatProps } from "@/app/utils/formatProps";
 import Link from "next/link";
 import React from "react";
 import { FaTwitter, FaInstagram, FaFacebook, FaYoutube } from "react-icons/fa";
+import FooterMap from "../ComponentMaps/FooterMap";
 
 interface FooterProps {
-  id: { value: string; active: boolean };
-  logo?: { value: string; active: boolean };
-  links?: Array<{
-    label: { type: "string"; value: string; active: boolean };
-    href: { type: "string"; value: string; active: boolean };
+  id: { type: "string"; value: string; active: boolean };
+  logo: { type: "image"; format: "image"; value: string; active: boolean };
+  links: {
+    type: "array";
+    value: {
+      label: { type: "string"; value: string; active: boolean };
+      href: { type: "string"; value: string; active: boolean };
+      active: boolean;
+    }[];
     active: boolean;
-  }>;
-  socialLinks?: Array<{
-    platform: { type: "string"; value: string; active: boolean };
-    href: { type: "string"; value: string; active: boolean };
+  };
+  socialLinks: {
+    type: "array";
+    value: {
+      platform: { type: "string"; value: string; active: boolean };
+      href: { type: "string"; value: string; active: boolean };
+      active: boolean;
+    }[];
     active: boolean;
-  }>;
-  copyrightText?: { value: string; active: boolean };
+  };
+  copyrightText: { type: "string"; value: string; active: boolean };
 }
-
-// Default props following structured format
-const defaultFooter: FooterProps = {
-  id: { value: "footer", active: true },
-  logo: { value: "/logo.webp", active: true },
-  links: [
-    {
-      label: { type: "string", value: "Pagedone", active: true },
-      href: { type: "string", value: "/", active: true },
-      active: true,
-    },
-    {
-      label: { type: "string", value: "Products", active: true },
-      href: { type: "string", value: "/", active: true },
-      active: true,
-    },
-    {
-      label: { type: "string", value: "Resources", active: true },
-      href: { type: "string", value: "/", active: true },
-      active: true,
-    },
-    {
-      label: { type: "string", value: "Blogs", active: true },
-      href: { type: "string", value: "/", active: true },
-      active: true,
-    },
-    {
-      label: { type: "string", value: "Support", active: true },
-      href: { type: "string", value: "/", active: true },
-      active: true,
-    },
-  ],
-  socialLinks: [
-    {
-      platform: { type: "string", value: "Twitter", active: true },
-      href: { type: "string", value: "/", active: true },
-      active: true,
-    },
-    {
-      platform: { type: "string", value: "Instagram", active: true },
-      href: { type: "string", value: "/", active: true },
-      active: true,
-    },
-    {
-      platform: { type: "string", value: "Facebook", active: true },
-      href: { type: "string", value: "/", active: true },
-      active: true,
-    },
-    {
-      platform: { type: "string", value: "YouTube", active: true },
-      href: { type: "string", value: "/", active: true },
-      active: true,
-    },
-  ],
-  copyrightText: {
-    value: "Setoria Security Ltd © YYYY, All rights reserved.",
-    active: true,
-  },
-};
 
 // Social Media Icon Mapping
 const socialIcons: Record<string, JSX.Element> = {
@@ -87,6 +37,7 @@ const socialIcons: Record<string, JSX.Element> = {
 };
 
 const Footer: React.FC<FooterProps> = (props) => {
+  const defaultFooter: FooterProps = FooterMap.Footer.metadata.props;
   // Merge default and passed props
   const formattedProps = formatProps(props);
   const mergedProps: FooterProps = {

@@ -25,6 +25,8 @@ interface PropsEditorProps {
     updatedProps: Record<string, any>,
     files: Record<string, File>
   ) => void;
+  navigationEditor?: boolean;
+  compKey?: string;
 }
 
 // Memoized Field Component for individual fields
@@ -162,8 +164,9 @@ export function PropsEditor({
   props,
   initialValues = {},
   onSave,
+  navigationEditor = false,
+  compKey,
 }: PropsEditorProps) {
-  console.log("PropsEditor render", props);
   // Initialize formValues with actual values
   const [formValues, setFormValues] = useState<Record<string, any>>(() =>
     Object.fromEntries(
@@ -183,7 +186,6 @@ export function PropsEditor({
       ])
     )
   );
-
   const [files, setFiles] = useState<Record<string, File>>({});
   const [imagePreviews, setImagePreviews] = useState<Record<string, string>>(
     () =>
@@ -233,7 +235,10 @@ export function PropsEditor({
 
   // Save handler
   const handleSave = () => {
-    onSave(formValues, files);
+    if (navigationEditor) {
+      const file = files["logo"];
+      onSave(compKey, formValues, file);
+    } else onSave(formValues, files);
   };
 
   const addValue = (formValues: Record<string, any>, key: string) => {

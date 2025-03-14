@@ -1,15 +1,10 @@
-import BannerCentered from "./Banners/BannerCentered";
-import TextBanner from "./Banners/TextBanner";
-import ImageBanner from "./Banners/ImageBanner";
-import ServicesList from "./Services/ServicesList";
-import AboutUs from "./AboutUs/AboutUs";
-import Banner_Carousel from "./Banners/Banner_Carousel/Banner_Carousel";
-import Contact from "./Contact/Contact";
-import FAQ from "./FAQ/FAQ";
-import TestimonialCarousel from "./Reviews/Testimonials";
-import Footer from "./Footer/Footer";
-import CenteredNav from "./Navbars/CenteredNav";
-import WhyChooseUs from "./AboutUs/Features";
+import ServicesList from "../ComponentLibrary/HowItWorksSections/Services/ServicesList";
+import AboutUs from "../ComponentLibrary/AboutUsSections/AboutUs/AboutUs";
+import Banner_Carousel from "../Banners/Banner_Carousel/Banner_Carousel";
+import Contact from "../ComponentLibrary/ContactFormSections/Contact/Contact";
+import FAQ from "../ComponentLibrary/FAQSections/FAQ/FAQ";
+import TestimonialCarousel from "../ComponentLibrary/TestimonialSections/Reviews/Testimonials";
+import WhyChooseUs from "../ComponentLibrary/AboutUsSections/AboutUs/Features";
 
 const Banners = {
   Banner_Carousel: {
@@ -810,168 +805,6 @@ const ReviewComponent = {
   },
 };
 
-const NavigationComponent = {
-  CenteredNav: {
-    component: CenteredNav,
-    name: "CenteredNav",
-    metadata: {
-      props: {
-        id: { type: "string", value: "centered-nav", active: true },
-        logo: {
-          type: "image",
-          format: "image",
-          value: "/logo.webp",
-          active: true,
-        },
-        menuItems: {
-          type: "array",
-          value: [
-            {
-              label: {
-                type: "string",
-                value: "Home",
-                active: true,
-              },
-              href: {
-                type: "string",
-                value: "/",
-                active: true,
-              },
-            },
-            {
-              label: {
-                type: "string",
-                value: "About",
-                active: true,
-              },
-              href: {
-                type: "string",
-                value: "/about",
-                active: true,
-              },
-            },
-            {
-              label: {
-                type: "string",
-                value: "Services",
-                active: true,
-              },
-              href: {
-                type: "string",
-                value: "/services",
-                active: true,
-              },
-            },
-            {
-              label: {
-                type: "string",
-                value: "Contact",
-                active: true,
-              },
-              href: {
-                type: "string",
-                value: "/contact",
-                active: true,
-              },
-            },
-          ],
-          active: true,
-        },
-        cta: {
-          type: "string",
-          value: "Get Started",
-          active: true,
-        },
-        ctaUrl: {
-          type: "string",
-          value: "/contact",
-          active: true,
-        },
-      },
-    },
-  },
-};
-
-const FooterComponent = {
-  Footer: {
-    component: Footer,
-    name: "Footer",
-    metadata: {
-      props: {
-        id: { type: "string", value: "footer", active: true },
-        logo: {
-          type: "image",
-          format: "image",
-          value: "/logo.webp",
-          active: true,
-        },
-        links: {
-          type: "array",
-          value: [
-            {
-              label: { type: "string", value: "Pagedone", active: true },
-              href: { type: "string", value: "/", active: true },
-              active: true,
-            },
-            {
-              label: { type: "string", value: "Products", active: true },
-              href: { type: "string", value: "/", active: true },
-              active: true,
-            },
-            {
-              label: { type: "string", value: "Resources", active: true },
-              href: { type: "string", value: "/", active: true },
-              active: true,
-            },
-            {
-              label: { type: "string", value: "Blogs", active: true },
-              href: { type: "string", value: "/", active: true },
-              active: true,
-            },
-            {
-              label: { type: "string", value: "Support", active: true },
-              href: { type: "string", value: "/", active: true },
-              active: true,
-            },
-          ],
-          active: true,
-        },
-        socialLinks: {
-          type: "array",
-          value: [
-            {
-              platform: { type: "string", value: "Twitter", active: true },
-              href: { type: "string", value: "/", active: true },
-              active: true,
-            },
-            {
-              platform: { type: "string", value: "Instagram", active: true },
-              href: { type: "string", value: "/", active: true },
-              active: true,
-            },
-            {
-              platform: { type: "string", value: "Facebook", active: true },
-              href: { type: "string", value: "/", active: true },
-              active: true,
-            },
-            {
-              platform: { type: "string", value: "YouTube", active: true },
-              href: { type: "string", value: "/", active: true },
-              active: true,
-            },
-          ],
-          active: true,
-        },
-        copyrightText: {
-          type: "string",
-          value: `Setoria Security Ltd ${new Date().getFullYear()}, All rights reserved.`,
-          active: true,
-        },
-      },
-    },
-  },
-};
-
 const ComponentMap = {
   ...Object.keys(Banners).reduce((acc, key) => {
     acc[key] = Banners[key];
@@ -995,14 +828,6 @@ const ComponentMap = {
   }, {} as Record<string, any>),
   ...Object.keys(ReviewComponent).reduce((acc, key) => {
     acc[key] = ReviewComponent[key];
-    return acc;
-  }, {} as Record<string, any>),
-  ...Object.keys(FooterComponent).reduce((acc, key) => {
-    acc[key] = FooterComponent[key];
-    return acc;
-  }, {} as Record<string, any>),
-  ...Object.keys(NavigationComponent).reduce((acc, key) => {
-    acc[key] = NavigationComponent[key];
     return acc;
   }, {} as Record<string, any>),
 };

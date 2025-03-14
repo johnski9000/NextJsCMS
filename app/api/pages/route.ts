@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 
-const WORKER_URL = "https://kv-worker.enquiries-01c.workers.dev";
+const WORKER_URL = process.env.KV_WORKER_URL;
 
 export async function POST(req: Request) {
   try {
     const { slug, pageData } = await req.json();
-
+    console.log("slug", slug);
     if (!slug || !pageData) {
       return NextResponse.json(
         { error: "Missing slug or pageData" },
@@ -18,7 +18,7 @@ export async function POST(req: Request) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(pageData),
     });
-
+    console.log("response", response);
     if (!response.ok) {
       return NextResponse.json(
         { error: "Failed to store data" },

@@ -1,20 +1,29 @@
 "use client";
-import { useDisclosure } from "@mantine/hooks";
 import { useRouter } from "next/navigation";
+import { Divider, ScrollArea, Box, Loader, Transition } from "@mantine/core";
+import { useEffect, useState } from "react";
 import {
-  Drawer,
-  Button,
-  Modal,
-  List,
-  ThemeIcon,
-  Divider,
-  ScrollArea,
-} from "@mantine/core";
-import { useState } from "react";
+  FaHome,
+  FaFileAlt,
+  FaCog,
+  FaBars,
+  FaColumns,
+  FaFile,
+  FaTags,
+} from "react-icons/fa";
+import { Button } from "@mantine/core";
+import { FaPlus, FaSignOutAlt } from "react-icons/fa";
 import { signOut } from "next-auth/react";
-import { FaPlus, FaEdit, FaSignOutAlt, FaBars } from "react-icons/fa";
-import { SidebarEditScreen } from "./SidebarEditScreen";
-
+import { FiRefreshCcw } from "react-icons/fi";
+import { showToast } from "@/app/utils/toast";
+import MenuItems from "./MenuItems";
+import AddPage from "./Modals/AddPage";
+import EditPage from "./Modals/EditPage";
+import Footer from "./Modals/Footer";
+import Navigation from "./Modals/Navigation";
+import Metadata from "./Modals/Metadata";
+import Settings from "./Modals/Settings";
+import Templates from "./Modals/Templates";
 interface PageData {
   key: string;
   value: any;
@@ -25,177 +34,228 @@ interface SidebarProps {
   initialPageData: PageData[];
 }
 
-function Sidebar({ slug, initialPageData }: SidebarProps) {
-  const [opened, { open, close }] = useDisclosure(false);
-  const [editModalOpen, setEditModalOpen] = useState(false);
-  const [addModalOpen, setAddModalOpen] = useState(false);
+function Sidebar({ initialPageData, slug }: SidebarProps) {
+  const [confirmDelete, setConfirmDelete] = useState(false as string | false);
+  const [openModal, setOpenModal] = useState(false as string | false);
   const [selectedElement, setSelectedElement] = useState<PageData | null>(null);
-  const [pages, setPages] = useState<PageData[]>(initialPageData || []);
-  const [loading, setLoading] = useState(false);
+  const [pages, setPages] = useState<PageData[]>([]);
   const router = useRouter();
+  const [isPagesOpen, setIsPagesOpen] = useState(false);
 
   /** Refresh Sidebar Pages */
-  const refreshSidebar = async (): Promise<void> => {
-    setLoading(true);
+  const refreshSidebar = async () => {
+    try {
+      await getAllPageData(); // Ensure latest data is fetched
+    } catch (error) {
+      console.error("Error refreshing sidebar:", error);
+    }
+  };
+
+  const getAllPageData = async () => {
+    try {
+      const response = await fetch(`/api/pages/all`);
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch pages");
+      }
+
+      const data: PageData[] = await response.json();
+      const pageData = data.map((page) => ({
+        key: page.key,
+        value: JSON.parse(page.value),
+      }));
+
+      setPages(pageData);
+    } catch (error) {
+      console.error("Error fetching all pages:", error);
+      showToast.error("Failed to fetch pages!");
+    }
+  };
+
+  // 🔹 Call `getAllPageData` only when the component mounts
+  useEffect(() => {
+    getAllPageData();
+  }, []);
+
+  const deletePage = async (slug: string) => {
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_URL}/api/pages/all`,
+        `${process.env.NEXT_PUBLIC_URL}/api/pages/delete/${slug}`,
         {
-          cache: "no-store",
+          method: "POST",
         }
       );
 
       if (response.ok) {
-        const updatedData: PageData[] = await response.json();
-        setPages(
-          updatedData.map((page) => ({
-            key: page.key,
-            value: JSON.parse(page.value),
-          }))
-        );
+        console.log("Page deleted successfully!");
+        setPages((prev) => prev.filter((page) => page.key !== slug));
+      } else {
+        console.error("Failed to delete page.");
       }
     } catch (error) {
-      console.error("Error refreshing sidebar:", error);
+      console.error("Error deleting page:", error);
     } finally {
-      setLoading(false);
+      refreshSidebar();
+      showToast.success("Page deleted successfully!");
+    }
+  };
+
+  const navigation = pages.find((page) => page.key === "Navigation");
+  const footer = pages.find((page) => page.key === "Footer");
+  const metaData = pages.find((page) => page.key === "Metadata");
+  const menuItems = pages.filter(
+    (page) =>
+      page.key !== "Navigation" &&
+      page.key !== "Settings" &&
+      page.key !== "Metadata" &&
+      page.key !== "Footer"
+  );
+  const RenderModals = () => {
+    // const checkSlug =
+    const checkSlug = () => {
+      if (selectedElement) {
+        if (selectedElement.key === slug) {
+          return slug;
+        } else {
+          return selectedElement.key;
+        }
+      }
+    };
+    switch (openModal) {
+      case "Add Page":
+        return (
+          <AddPage
+            openModal={openModal}
+            setOpenModal={setOpenModal}
+            refreshSidebar={refreshSidebar}
+          />
+        );
+      case "Edit Page":
+        return (
+          <EditPage
+            openModal={openModal}
+            setOpenModal={setOpenModal}
+            selectedElement={selectedElement}
+            slug={checkSlug()}
+            refreshSidebar={refreshSidebar}
+          />
+        );
+      case "Footer":
+        return (
+          <Footer
+            openModal={openModal}
+            setOpenModal={setOpenModal}
+            footer={footer}
+            refreshSidebar={refreshSidebar}
+          />
+        );
+      case "Navigation":
+        return (
+          <Navigation
+            openModal={openModal}
+            setOpenModal={setOpenModal}
+            navigation={navigation}
+            refreshSidebar={refreshSidebar}
+          />
+        );
+      case "Metadata":
+        return (
+          <Metadata
+            savedMetaData={metaData ? metaData.value.props : {}}
+            openModal={openModal}
+            setOpenModal={setOpenModal}
+            refreshSidebar={refreshSidebar}
+          />
+        );
+      case "Settings":
+        return <Settings openModal={openModal} setOpenModal={setOpenModal} />;
+      case "Templates":
+        return <Templates openModal={openModal} setOpenModal={setOpenModal} />;
     }
   };
 
   return (
-    <>
-      {/* Floating Menu Button */}
-      <div
-        className="fixed top-6 left-6 rounded-full p-4 shadow-lg bg-blue-600 text-white flex items-center space-x-2 z-50 cursor-pointer"
-        onClick={open}
+    <Box
+      title="CMS Menu"
+      className="fixed left-0 top-0 bottom-0 max-h-screen flex flex-col  w-[250px] bg-white shadow-md"
+      style={{ zIndex: 100 }}
+    >
+      <aside
+        id="sidebar-multi-level-sidebar"
+        className="flex flex-col justify-between flex-1"
+        aria-label="Sidebar"
       >
-        <FaBars />
-      </div>
+        <ScrollArea className="flex-grow bg-white">
+          <div className="flex-1 px-3 py-4 overflow-y-auto dark:bg-gray-800">
+            <h4 className="text-lg font-semibold text-gray-700 dark:text-white">
+              Menu
+            </h4>
 
-      {/* Sidebar Drawer */}
-      <Drawer
-        opened={opened}
-        onClose={close}
-        title="CMS Menu"
-        padding="xl"
-        classNames={{ body: "flex flex-col h-full max-h-[calc(100vh-100px)]" }}
-      >
-        <ScrollArea className="flex-grow">
-          <List spacing="md" size="md">
-            {loading ? (
-              <List.Item>Loading...</List.Item>
-            ) : (
-              [...pages]
-                .sort((a, b) =>
-                  a.key === "home" ? -1 : b.key === "home" ? 1 : 0
-                )
-                .map((page, index) => (
-                  <List.Item
-                    key={index}
-                    icon={
-                      <ThemeIcon
-                        color={page.key === slug ? "blue" : "gray"}
-                        size={24}
-                        radius="xl"
-                      >
-                        <FaEdit />
-                      </ThemeIcon>
-                    }
-                    className={`cursor-pointer flex items-center transition-all ${
-                      page.key === slug || (page.key === "home" && slug === "")
-                        ? "text-blue-600 font-bold"
-                        : "hover:text-blue-600"
-                    }`}
-                    onClick={() => {
-                      if (page.key === "home") {
-                        router.push("/");
-                        return;
-                      } else {
-                        router.push(`/${page.key}`);
-                      }
-                    }}
-                  >
-                    {page.key} page
-                  </List.Item>
-                ))
-            )}
-          </List>
-
-          <Divider className="my-3" />
+            <Divider className="my-3" />
+            <MenuItems
+              confirmDelete={confirmDelete}
+              setConfirmDelete={setConfirmDelete}
+              deletePage={deletePage}
+              slug={slug}
+              isPagesOpen={isPagesOpen}
+              setIsPagesOpen={setIsPagesOpen}
+              pages={menuItems}
+              router={router}
+              setOpenModal={setOpenModal}
+              setSelectedElement={setSelectedElement}
+            />
+          </div>
         </ScrollArea>
-
-        {/* Current Page Actions */}
-        <div className="p-3 bg-gray-100 rounded-md shadow-sm">
-          <h4 className="text-lg font-semibold ">Current Page</h4>
-          <p className="text-sm ">{slug}</p>
+        <div className="p-4 bg-white flex flex-col gap-4">
           <Button
             fullWidth
-            mt="md"
-            variant="outline"
+            variant="light"
+            className="mt-4 flex items-center gap-2 transition-all duration-200 font-medium"
+            onClick={async () => {
+              await refreshSidebar();
+              showToast.success("Pages refreshed successfully!");
+            }}
+          >
+            <FiRefreshCcw />
+          </Button>
+          <Button
+            fullWidth
+            variant="light"
+            className="flex items-center gap-2  font-medium"
+            leftSection={<FaPlus />}
+            onClick={() => setOpenModal("Add Page")}
+          >
+            Add New Page
+          </Button>
+
+          <Button
+            fullWidth
+            variant="light"
+            className="flex items-center gap-2 transition-all duration-200 font-medium"
+            leftSection={<FaFileAlt />}
             onClick={() => {
               const currentPage = pages.find((p) => p.key === slug);
               setSelectedElement(currentPage || null);
-              setEditModalOpen(true);
+              setOpenModal("Edit Page");
             }}
-            className="font-semibold mt-2"
           >
-            <FaEdit className="mr-2" /> Edit Page
+            Edit Current Page
+          </Button>
+
+          <Button
+            fullWidth
+            color="red"
+            variant="filled"
+            className="mt-auto flex items-center gap-2 hover:bg-red-700 transition-all duration-200 font-semibold"
+            leftSection={<FaSignOutAlt />}
+            onClick={() => signOut()}
+          >
+            Sign Out
           </Button>
         </div>
-
-        <Divider className="my-3" />
-
-        {/* Sign Out Button (Fixed at Bottom) */}
-        <Button
-          fullWidth
-          color="red"
-          onClick={() => signOut()}
-          className="mt-auto font-semibold"
-        >
-          <FaSignOutAlt className="mr-2" /> Sign Out
-        </Button>
-      </Drawer>
-
-      {/* Edit Element Modal */}
-      <Modal
-        centered
-        opened={editModalOpen && !!selectedElement}
-        onClose={() => setEditModalOpen(false)}
-        title={
-          <div className="flex items-center space-x-2 text-lg font-semibold ">
-            <FaEdit className="text-blue-600" />
-            <span>Edit {selectedElement?.key}</span>
-          </div>
-        }
-        size="xl"
-        radius="md"
-        overlayProps={{ blur: 5, opacity: 0.2 }}
-        transitionProps={{ transition: "pop", duration: 200 }}
-        classNames={{
-          content: "p-2 rounded-lg shadow-xl ",
-          body: "space-y-4",
-        }}
-      >
-        <Divider className="mb-4" />
-        {selectedElement && (
-          <div className=" overflow-y-auto p-2">
-            <SidebarEditScreen
-              selectedElement={selectedElement}
-              slug={slug}
-              refreshSidebar={refreshSidebar}
-            />
-          </div>
-        )}
-      </Modal>
-
-      {/* Add New Element Modal */}
-      <Modal
-        opened={addModalOpen}
-        onClose={() => setAddModalOpen(false)}
-        title={`Add New Element to ${slug}`}
-      >
-        <p>Form for adding a new element</p>
-      </Modal>
-    </>
+      </aside>
+      {RenderModals()}
+    </Box>
   );
 }
 

@@ -29,8 +29,7 @@ const defaultBanners: BannerCarouselProps = {
     value: [
       {
         image: {
-          value:
-            "https://smartsecuritypros.com/wp-content/uploads/2021/09/on-site-security-guard-at-a-bar.jpg",
+          value: "https://placehold.co/600x400",
           active: true,
         },
         title: {
@@ -57,8 +56,7 @@ const defaultBanners: BannerCarouselProps = {
       },
       {
         image: {
-          value:
-            "https://t-class.co.uk/wp-content/uploads/2021/04/Festival-and-Event-Security-Manchester.jpg",
+          value: "https://placehold.co/600x400",
           active: true,
         },
         title: {
@@ -85,8 +83,7 @@ const defaultBanners: BannerCarouselProps = {
       },
       {
         image: {
-          value:
-            "https://i0.wp.com/airvis.co.uk/wp-content/uploads/Residential-security-services.png?fit=1500%2C1015&ssl=1",
+          value: "https://placehold.co/600x400",
           active: true,
         },
         title: {

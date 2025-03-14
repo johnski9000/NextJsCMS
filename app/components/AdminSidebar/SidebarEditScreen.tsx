@@ -8,7 +8,7 @@ import { useListState } from "@mantine/hooks";
 import { useEffect, useState } from "react";
 import cx from "clsx";
 import classes from "./Sidebar.module.css";
-import ComponentMap from "../ComponentMap";
+import ComponentMap from "../ComponentMaps/ComponentMap";
 import { PropsEditor } from "./PropsEditor";
 import { SavePage } from "../../utils/savePage";
 import { toast } from "react-toastify";
@@ -122,7 +122,6 @@ export function SidebarEditScreen({
       if (response?.success) {
         setUploading(false);
         showToast.success("Page saved successfully!");
-        router.refresh();
         refreshSidebar();
       } else {
         setUploading(false);

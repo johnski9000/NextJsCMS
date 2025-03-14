@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-const WORKER_URL = "https://kv-worker.enquiries-01c.workers.dev";
+const WORKER_URL = process.env.KV_WORKER_URL;
 
 export async function GET() {
   try {

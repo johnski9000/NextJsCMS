@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useDisclosure } from "@mantine/hooks";
 import { Drawer } from "@mantine/core";
 import { formatProps } from "@/app/utils/formatProps";
+import { useSession } from "next-auth/react";
+import NavigationMap from "../ComponentMaps/NavigationMap";
 
 interface CenteredNavProps {
   id: { value: string; active: boolean };
@@ -17,34 +19,18 @@ interface CenteredNavProps {
   ctaUrl?: { value: string; active: boolean };
 }
 
-const defaultNav: CenteredNavProps = {
-  id: { value: "centered-nav", active: true },
-  logo: { value: "/logo.webp", active: true },
-  menuItems: [
-    {
-      label: { value: "Home", active: true },
-      href: { value: "/", active: true },
-    },
-    {
-      label: { value: "About", active: true },
-      href: { value: "/about", active: true },
-    },
-    {
-      label: { value: "Contact", active: true },
-      href: { value: "/contact", active: true },
-    },
-  ],
-  cta: { value: "Get Started", active: true },
-  ctaUrl: { value: "/get-started", active: true },
-};
-
-const CenteredNav: React.FC<CenteredNavProps> = (props) => {
+const CenteredNav: React.FC<CenteredNavProps & { isPreview?: boolean }> = (
+  props
+) => {
+  const defaultNav: CenteredNavProps = NavigationMap.CenteredNav.metadata.props;
+  const { isPreview } = props;
   const formattedProps = formatProps(props);
 
   const mergedProps = { ...defaultNav, ...formattedProps };
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [opened, { open, close }] = useDisclosure(false);
+  const { data: session, status } = useSession();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -58,7 +44,9 @@ const CenteredNav: React.FC<CenteredNavProps> = (props) => {
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled ? "bg-black/60 backdrop-blur-md shadow-md" : "bg-transparent"
-      }`}
+      } ${
+        session && !isPreview ? "left-[250px] w-[calc(100%-250px)]" : "w-full"
+      }}`}
       id={mergedProps.id.value}
     >
       <div className="max-w-[1440px] mx-auto flex flex-wrap items-center justify-between mx-auto p-4">
@@ -175,7 +163,9 @@ const CenteredNav: React.FC<CenteredNavProps> = (props) => {
               <li key={index}>
                 <a
                   href={item.href.value}
-                  className="block py-2 px-4 text-white rounded-sm transition-all duration-300 hover:text-[rgba(209,159,78,1)]"
+                  className={`block py-2 px-4 ${
+                    isPreview ? "text-black" : "text-white"
+                  } rounded-sm transition-all duration-300 hover:text-[rgba(209,159,78,1)]`}
                 >
                   {item.label.value}
                 </a>

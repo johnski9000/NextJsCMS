@@ -2,7 +2,7 @@
 import { Button, Divider, Modal, Text } from "@mantine/core";
 import React, { useState } from "react";
 import { FaArrowLeft, FaEye } from "react-icons/fa";
-import ComponentMap from "../ComponentMap";
+import ComponentMap from "../ComponentMaps/ComponentMap";
 import { SavePage } from "@/app/utils/savePage";
 import { useRouter } from "next/navigation";
 
@@ -36,7 +36,8 @@ function AddComponent({
     try {
       const newComponent = { component: componentKey, props: {} };
       const mergedState = [...state, newComponent];
-
+      console.log("mergedState", mergedState);
+      console.log("selectedPage", selectedPage);
       const response = await SavePage({
         selectedPage,
         savedItems: mergedState,
@@ -44,7 +45,6 @@ function AddComponent({
 
       if (response?.success) {
         router.refresh();
-        handleRefresh();
       } else {
         console.error("Failed to save page:", response);
       }

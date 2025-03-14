@@ -1,5 +1,6 @@
 import { ActionIcon, Button, Divider, Modal } from "@mantine/core";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React from "react";
 import {
   FaBars,
@@ -13,13 +14,15 @@ import {
   FaTags,
   FaTrash,
 } from "react-icons/fa";
-import { NextRouter } from "next/router";
 
 // Define page type
 interface Page {
   key: string;
 }
-
+interface PageData {
+  key: string;
+  value: any;
+}
 // Define props interface
 interface MenuItemsProps {
   isPagesOpen: boolean;
@@ -28,10 +31,10 @@ interface MenuItemsProps {
   slug: string;
   deletePage: (slug: string) => void;
   confirmDelete: string | false;
-  router: NextRouter;
+
   pages: Page[];
   setOpenModal: (value: string) => void;
-  setSelectedElement: (value: Page | null) => void;
+  setSelectedElement: (value: PageData | null) => void;
 }
 
 function MenuItems({
@@ -41,11 +44,12 @@ function MenuItems({
   slug,
   deletePage,
   confirmDelete,
-  router,
+
   pages,
   setOpenModal,
   setSelectedElement,
 }: MenuItemsProps) {
+  const router = useRouter();
   const items = [
     {
       icon: <FaHome className="w-5 h-5" />,
@@ -136,7 +140,9 @@ function MenuItems({
                             const currentPage = pages.find(
                               (p) => p.key === subItem.label
                             );
-                            setSelectedElement(currentPage || null);
+                            setSelectedElement(
+                              currentPage ? { ...currentPage, value: {} } : null
+                            );
                             setOpenModal("Edit Page");
                           }}
                           className="hover:bg-blue-100 dark:hover:bg-blue-800 hover:scale-125 transition-all"

@@ -200,7 +200,6 @@ function Sidebar({ initialPageData, slug }: SidebarProps) {
               isPagesOpen={isPagesOpen}
               setIsPagesOpen={setIsPagesOpen}
               pages={menuItems}
-              router={router}
               setOpenModal={setOpenModal}
               setSelectedElement={setSelectedElement}
             />

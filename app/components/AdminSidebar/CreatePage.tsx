@@ -11,10 +11,16 @@ import React, { useState } from "react";
 import { FaCheck, FaArrowRight } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 
-function CreatePage({ refreshSidebar, closeModal }) {
-  const [slug, setSlug] = useState("");
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
+// Define props interface
+interface CreatePageProps {
+  refreshSidebar: () => void;
+  closeModal: () => void;
+}
+
+function CreatePage({ refreshSidebar, closeModal }: CreatePageProps) {
+  const [slug, setSlug] = useState<string>("");
+  const [error, setError] = useState<string>("");
+  const [success, setSuccess] = useState<boolean>(false);
   const router = useRouter();
   const slugRegex =
     /^[a-z0-9]+(?:[-a-z0-9]*[a-z0-9])?(?:\/[a-z0-9]+(?:[-a-z0-9]*[a-z0-9])?)*$/;
@@ -49,7 +55,10 @@ function CreatePage({ refreshSidebar, closeModal }) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ slug: cleanedSlug, pageData: { components: [] } }),
+      body: JSON.stringify({
+        slug: cleanedSlug,
+        pageData: { components: [] },
+      }),
     });
 
     if (response.ok) {
@@ -62,7 +71,7 @@ function CreatePage({ refreshSidebar, closeModal }) {
   };
 
   return (
-    <div className="p-6 mx-auto ">
+    <div className="p-6 mx-auto">
       <Divider className="mb-4" />
 
       {/* Tutorial Section */}

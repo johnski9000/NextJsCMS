@@ -3,9 +3,19 @@
 import { useState, useEffect } from "react";
 import { Select } from "@mantine/core";
 
+// Define props interface
 interface ImageSelectorProps {
   value: string;
   onChange: (newValue: string) => void;
+}
+
+// Define type for R2 API response
+interface R2Object {
+  url: string;
+}
+
+interface R2Response {
+  objects: R2Object[];
 }
 
 export const ImageSelector: React.FC<ImageSelectorProps> = ({
@@ -13,7 +23,7 @@ export const ImageSelector: React.FC<ImageSelectorProps> = ({
   onChange,
 }) => {
   const [r2Images, setR2Images] = useState<string[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   // Fetch images from Cloudflare R2
   useEffect(() => {
@@ -24,8 +34,8 @@ export const ImageSelector: React.FC<ImageSelectorProps> = ({
           method: "GET",
         });
         if (!response.ok) throw new Error("Failed to fetch R2 images");
-        const data = await response.json();
-        const imageUrls = data.objects.map((obj: { url: string }) => obj.url);
+        const data = (await response.json()) as R2Response;
+        const imageUrls = data.objects.map((obj: R2Object) => obj.url);
         setR2Images(imageUrls);
       } catch (error) {
         console.error("Failed to fetch R2 images:", error);
@@ -45,7 +55,7 @@ export const ImageSelector: React.FC<ImageSelectorProps> = ({
         label: img.split("/").pop() || img,
       }))}
       value={value}
-      onChange={(selected) => onChange(selected || "")} // Ensure string, not null
+      onChange={(selected) => onChange(selected ?? "")} // Use nullish coalescing for cleaner null handling
       searchable
       disabled={loading}
     />

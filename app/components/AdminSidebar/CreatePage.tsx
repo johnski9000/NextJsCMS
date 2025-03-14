@@ -26,7 +26,7 @@ function CreatePage({ refreshSidebar, closeModal }: CreatePageProps) {
     /^[a-z0-9]+(?:[-a-z0-9]*[a-z0-9])?(?:\/[a-z0-9]+(?:[-a-z0-9]*[a-z0-9])?)*$/;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let value = e.target.value.trim().toLowerCase();
+    const value = e.target.value.trim().toLowerCase();
 
     // Allow user to type `/` freely but sanitize on submission
     setSlug(value);
@@ -45,7 +45,7 @@ function CreatePage({ refreshSidebar, closeModal }: CreatePageProps) {
     if (!slug || error) return;
 
     // **Sanitization before sending to API**
-    let cleanedSlug = slug
+    const cleanedSlug = slug
       .replace(/^\/+/, "") // Remove leading slashes
       .replace(/\/+$/, "") // Remove trailing slashes
       .replace(/\/{2,}/g, "/"); // Remove consecutive slashes
@@ -123,9 +123,9 @@ function CreatePage({ refreshSidebar, closeModal }: CreatePageProps) {
             page.
           </List.Item>
           <List.Item>
-            <strong>Example:</strong> If you create a "team" page, you might
-            want to add a sub-page like "team/john-doe" to show details about a
-            specific team member.
+            <strong>Example:</strong> If you create a &quot;team&quot; page, you
+            might want to add a sub-page like &quot;team/john-doe&quot; to show
+            details about a specific team member.
           </List.Item>
           <List.Item
             icon={

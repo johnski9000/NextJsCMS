@@ -10,26 +10,30 @@ import {
   NumberInput,
 } from "@mantine/core";
 
+// Define PropItem interface with specific types
 interface PropItem {
   key?: string;
-  type: string;
+  type: "string" | "number" | "boolean" | "image" | "array";
   format?: string | null;
-  value: any;
+  value: any; // Could be refined further based on type
   active?: boolean;
 }
 
+// Define props interface with unified onSave signature
 interface PropsEditorProps {
   props: Record<string, PropItem>;
   initialValues?: Record<string, any>;
   onSave: (
-    updatedProps: Record<string, any>,
-    files: Record<string, File>
+    compKeyOrProps: string | Record<string, any>,
+    propsOrFiles: Record<string, any> | Record<string, File>,
+    files?: Record<string, File>
   ) => void;
   navigationEditor?: boolean;
   compKey?: string;
 }
 
-// Memoized Field Component for individual fields
+// Memoized Field Component
+// eslint-disable-next-line react/display-name
 const Field = memo(
   ({
     fieldDef,
@@ -45,7 +49,7 @@ const Field = memo(
         return (
           <TextInput
             label={fieldDef.key}
-            value={value || ""}
+            value={(value as string) || ""}
             onChange={(e) => onChange(e.target.value)}
           />
         );
@@ -53,7 +57,7 @@ const Field = memo(
         return (
           <NumberInput
             label={fieldDef.key}
-            value={value}
+            value={value as number | undefined}
             onChange={(val) => onChange(val)}
           />
         );
@@ -61,14 +65,14 @@ const Field = memo(
         return (
           <Checkbox
             label={fieldDef.key}
-            checked={value}
+            checked={value as boolean}
             onChange={(e) => onChange(e.target.checked)}
           />
         );
       case "image":
         return (
           <div className="flex flex-col gap-4 items-center space-x-4">
-            {value && <Image src={value} width={100} height={100} />}
+            {value && <Image src={value as string} width={100} height={100} />}
             <FileInput
               onChange={(file) => {
                 if (file) {
@@ -91,7 +95,8 @@ const Field = memo(
     prevProps.onChange === nextProps.onChange
 );
 
-// Memoized Item Component for array items
+// Memoized Item Component
+// eslint-disable-next-line react/display-name
 const Item = memo(
   ({
     item,
@@ -128,7 +133,7 @@ const Item = memo(
     prevProps.onChange === nextProps.onChange
 );
 
-// ArrayField Component for array-type fields
+// ArrayField Component
 const ArrayField = ({
   fieldDef,
   value,
@@ -140,7 +145,6 @@ const ArrayField = ({
   onChange: (index: number, subKey: string, newValue: any, file?: File) => void;
   onRemoveItem: (index: number) => void;
 }) => {
-  // Assume the first item's structure defines sub-fields
   const subFieldDefs = fieldDef.value[0] as Record<string, PropItem>;
   return (
     <div className="space-y-4">
@@ -167,7 +171,6 @@ export function PropsEditor({
   navigationEditor = false,
   compKey,
 }: PropsEditorProps) {
-  // Initialize formValues with actual values
   const [formValues, setFormValues] = useState<Record<string, any>>(() =>
     Object.fromEntries(
       Object.entries(props).map(([key, prop]) => [
@@ -203,7 +206,6 @@ export function PropsEditor({
       }, {} as Record<string, string>)
   );
 
-  // Handle changes for simple fields
   const handleChange = (key: string, newValue: any, file?: File) => {
     setFormValues((prev) => ({ ...prev, [key]: newValue }));
     if (file) {
@@ -212,7 +214,6 @@ export function PropsEditor({
     }
   };
 
-  // Handle changes for array fields
   const handleArrayChange = (
     arrayKey: string,
     index: number,
@@ -222,7 +223,7 @@ export function PropsEditor({
   ) => {
     setFormValues((prev) => ({
       ...prev,
-      [arrayKey]: prev[arrayKey].map((item, i) =>
+      [arrayKey]: prev[arrayKey].map((item: any, i: number) =>
         i === index ? { ...item, [subKey]: newValue } : item
       ),
     }));
@@ -233,12 +234,13 @@ export function PropsEditor({
     }
   };
 
-  // Save handler
   const handleSave = () => {
-    if (navigationEditor) {
+    if (navigationEditor && compKey) {
       const file = files["logo"];
-      onSave(compKey, formValues, file);
-    } else onSave(formValues, files);
+      onSave(compKey, formValues, { logo: file });
+    } else {
+      onSave(formValues, files);
+    }
   };
 
   const addValue = (formValues: Record<string, any>, key: string) => {
@@ -249,13 +251,14 @@ export function PropsEditor({
         Object.fromEntries(
           Object.entries(props[key].value[0]).map(([subKey, subProp]) => [
             subKey,
-            subProp.value,
+            (subProp as PropItem).value,
           ])
         ),
       ],
     };
     setFormValues(updatedValues);
   };
+
   const removeValue = (formValues: Record<string, any>, key: string) => {
     const updatedValues = {
       ...formValues,
@@ -263,12 +266,12 @@ export function PropsEditor({
     };
     setFormValues(updatedValues);
   };
+
   const removeItem = (arrayKey: string, index: number) => {
     setFormValues((prev) => ({
       ...prev,
-      [arrayKey]: prev[arrayKey].filter((_, i) => i !== index),
+      [arrayKey]: prev[arrayKey].filter((_: any, i: number) => i !== index),
     }));
-    // Optionally clean up files and previews if needed
     const fileKeyPrefix = `${arrayKey}[${index}]`;
     setFiles((prev) => {
       const updatedFiles = { ...prev };
@@ -289,6 +292,7 @@ export function PropsEditor({
       return updatedPreviews;
     });
   };
+
   return (
     <div className="flex flex-col gap-4">
       {Object.entries(props).map(([key, fieldDef]) =>
@@ -296,9 +300,8 @@ export function PropsEditor({
           <div key={key} className="space-y-4">
             <h2 className="font-semibold">{key}</h2>
             <ArrayField
-              key={key}
               fieldDef={fieldDef}
-              value={formValues[key]}
+              value={formValues[key] as Record<string, any>[]}
               onChange={(index, subKey, newValue, file) =>
                 handleArrayChange(key, index, subKey, newValue, file)
               }
@@ -314,9 +317,8 @@ export function PropsEditor({
           </div>
         ) : (
           <div key={key} className="space-y-4">
-            <h2 className="font-semibold">{key}</h2>{" "}
+            <h2 className="font-semibold">{key}</h2>
             <Field
-              key={key}
               fieldDef={fieldDef}
               value={formValues[key]}
               onChange={(newValue, file) => handleChange(key, newValue, file)}

@@ -13,6 +13,26 @@ import {
   FaTags,
   FaTrash,
 } from "react-icons/fa";
+import { NextRouter } from "next/router";
+
+// Define page type
+interface Page {
+  key: string;
+}
+
+// Define props interface
+interface MenuItemsProps {
+  isPagesOpen: boolean;
+  setIsPagesOpen: (value: boolean) => void;
+  setConfirmDelete: (value: string | false) => void;
+  slug: string;
+  deletePage: (slug: string) => void;
+  confirmDelete: string | false;
+  router: NextRouter;
+  pages: Page[];
+  setOpenModal: (value: string) => void;
+  setSelectedElement: (value: Page | null) => void;
+}
 
 function MenuItems({
   isPagesOpen,
@@ -25,7 +45,7 @@ function MenuItems({
   pages,
   setOpenModal,
   setSelectedElement,
-}) {
+}: MenuItemsProps) {
   const items = [
     {
       icon: <FaHome className="w-5 h-5" />,
@@ -58,16 +78,15 @@ function MenuItems({
       label: "Footer",
       onClick: () => setOpenModal("Footer"),
     },
-
     {
       icon: <FaFile className="w-5 h-5" />,
       label: "View Templates",
       onClick: () => setOpenModal("Templates"),
     },
     {
-      icon: <FaTags className="w-5 h-5" />, // Metadata Icon (SEO)
+      icon: <FaTags className="w-5 h-5" />,
       label: "Metadata",
-      onClick: () => setOpenModal("Metadata"), // New Metadata Section
+      onClick: () => setOpenModal("Metadata"),
     },
     {
       icon: <FaCog className="w-5 h-5" />,
@@ -75,6 +94,7 @@ function MenuItems({
       onClick: () => setOpenModal("Settings"),
     },
   ];
+
   return (
     <ul className="space-y-2 font-medium">
       {items.map((item, index) => (
@@ -119,7 +139,7 @@ function MenuItems({
                             setSelectedElement(currentPage || null);
                             setOpenModal("Edit Page");
                           }}
-                          className=" hover:bg-blue-100 dark:hover:bg-blue-800 hover:scale-125 transition-all "
+                          className="hover:bg-blue-100 dark:hover:bg-blue-800 hover:scale-125 transition-all"
                         >
                           <FaEdit size={14} />
                         </ActionIcon>
@@ -143,7 +163,7 @@ function MenuItems({
                         variant="light"
                         size="sm"
                         onClick={() => setConfirmDelete(subItem.label)}
-                        className=" ml-2 hover:bg-red-100 dark:hover:bg-red-800 transition-colors"
+                        className="ml-2 hover:bg-red-100 dark:hover:bg-red-800 transition-colors"
                       >
                         <FaTrash size={14} />
                       </ActionIcon>
@@ -153,7 +173,7 @@ function MenuItems({
                           opened={confirmDelete === subItem.label}
                           onClose={() => setConfirmDelete(false)}
                           title={
-                            <div className="flex items-center space-x-2 text-lg font-semibold ">
+                            <div className="flex items-center space-x-2 text-lg font-semibold">
                               <FaTrash className="text-red-600" />
                               <span>Delete /{subItem.label}?</span>
                             </div>
@@ -162,7 +182,7 @@ function MenuItems({
                           radius="md"
                           classNames={{
                             inner: "animate-fadeUp",
-                            content: "p-2 rounded-lg shadow-xl ",
+                            content: "p-2 rounded-lg shadow-xl",
                             body: "space-y-4",
                           }}
                         >

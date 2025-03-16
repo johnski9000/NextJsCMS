@@ -1,16 +1,9 @@
-"use client"; // Remove this since it's a server component
-
 import { notFound } from "next/navigation";
-import ComponentMap from "../components/ComponentMaps/ComponentMap";
-import Sidebar from "../components/AdminSidebar/Sidebar";
+import ComponentMap from "@/app/components/ComponentMaps/ComponentMap";
+import Sidebar from "@/app/components/AdminSidebar/Sidebar";
 import { getServerSession } from "next-auth";
-import DynamicNavigation from "../components/DynamicNavigation";
-import DynamicFooter from "../components/DynamicFooter";
-
-// Define the props type for a catch-all route
-interface PageProps {
-  params: { slug: string[] }; // slug is always string[], not optional
-}
+import DynamicNavigation from "@/app/components/DynamicNavigation";
+import DynamicFooter from "@/app/components/DynamicFooter";
 
 // Fetch page data
 async function getPageData(slug: string) {
@@ -45,15 +38,19 @@ async function getAllPageData(): Promise<{ key: string; value: any }[]> {
   }
 }
 
-// Remove 'use client' since this is a server component
-export default async function Page({ params }: PageProps) {
-  const { slug } = params; // No need to await params, it's not a Promise
-  const slugArray = Array.isArray(slug) ? slug : []; // Already guaranteed to be string[]
+export default async function Page({
+  params,
+}: {
+  params: { slug?: string[] };
+}) {
+  const { slug } = await params;
+  // ✅ Ensure params.slug exists and is an array
+  const slugArray = Array.isArray(slug) ? slug : [];
   const concatSlug = slugArray.join("/");
 
   console.log("Resolved slug:", concatSlug);
 
-  // Prevent recursive fetching
+  // ✅ Prevent recursive fetching
   if (concatSlug.includes("api/pages")) {
     console.error("Detected recursive fetch attempt, aborting request.");
     return notFound();
@@ -64,8 +61,7 @@ export default async function Page({ params }: PageProps) {
   const allPageData = await getAllPageData();
   const navigation = allPageData?.find((page) => page.key === "Navigation");
   const footer = allPageData?.find((page) => page.key === "Footer");
-
-  // Ensure page data doesn't trigger infinite fetch loops
+  // ✅ Ensure page data doesn't trigger infinite fetch loops
   if (pageData?.key?.includes("api/pages")) {
     console.error("Detected malformed page data, preventing re-render loop.");
     return notFound();
@@ -92,6 +88,7 @@ export default async function Page({ params }: PageProps) {
       <main className="flex min-h-screen w-[calc(100%-250px)] ml-[250px]">
         {session && <Sidebar slug={concatSlug} initialPageData={allPageData} />}
         <div className="flex flex-col w-full min-h-screen justify-center items-center">
+          {" "}
           {navigation && <DynamicNavigation selectedNav={navigation?.value} />}
           <h1>Page is empty, add components in sidebar :)</h1>
           {footer && <DynamicFooter selectedFooter={footer?.value} />}
@@ -101,10 +98,11 @@ export default async function Page({ params }: PageProps) {
   }
 
   return (
-    <main className="flex min-h-screen">
+    <main className="flex min-h-screen ">
       {session && <Sidebar slug={concatSlug} initialPageData={allPageData} />}
       <div className="w-[calc(100%-250px)] ml-[250px]">
         {navigation && <DynamicNavigation selectedNav={navigation?.value} />}
+
         {pageData.components.map(
           (
             component: { component: keyof typeof ComponentMap; props: any },

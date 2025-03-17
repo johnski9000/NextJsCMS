@@ -97,7 +97,7 @@ function PricingPackages() {
   ];
   const handleClick = (plan: { stripeID: string }) => {
     if (session) {
-      return `/checkout/${plan.stripeID}`;
+      return `/dashboard/checkout/${plan.stripeID}`;
     } else {
       return `/signup?plan=${plan.stripeID}`;
     }

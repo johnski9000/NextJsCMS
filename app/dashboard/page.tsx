@@ -194,6 +194,11 @@ export default function DashboardPage() {
             </span>
           </h6>
           <p className="text-sm text-orange-200">Dashboard</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-8">
+              <div className="border border-orange-500/30 rounded-xl shadow-md shadow-orange-500/10 overflow-hidden">
+                <Image src="/dashboard-placeholder.png" alt="Dashboard Placeholder" width={500} height={300} />
+                </div>
+            </div>
         </div>
 
         <div className="w-full p-8">

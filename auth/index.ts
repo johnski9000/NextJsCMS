@@ -58,7 +58,7 @@ export const authOptions: NextAuthOptions = {
           .select("id")
           .eq("id", data.user.id)
           .single();
-
+        console.log("existingUser", existingUser);
         if (!existingUser) {
           await supabase.from("users").insert([
             {
@@ -74,12 +74,12 @@ export const authOptions: NextAuthOptions = {
         }
 
         // Ensure the `subscriptions` entry exists (Webhook updates details later)
-        const { data: existingSubscription } = await supabase
+        const { data: existingSubscription, error: readError } = await supabase
           .from("subscriptions")
           .select("id")
           .eq("user_id", data.user.id)
           .single();
-
+        console.log("existingSubscription", existingSubscription, readError);
         if (!existingSubscription) {
           await supabase.from("subscriptions").insert([
             {
@@ -122,5 +122,8 @@ export const authOptions: NextAuthOptions = {
       session.stripeCustomerId = token.stripeCustomerId as string;
       return session;
     },
+  },
+  pages: {
+    signIn: "/login",
   },
 };

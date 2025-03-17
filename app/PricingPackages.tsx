@@ -1,8 +1,9 @@
+"use client";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import React, { useState } from "react";
 
-function PricingPackages() {
+function PricingPackages({ userPage = false }) {
   const [isMonthly, setIsMonthly] = useState(true);
   const { data: session, status } = useSession();
   console.log("Session", session);
@@ -103,8 +104,8 @@ function PricingPackages() {
     }
   };
   const PricingCard = ({ plan }) => (
-    <div className="lg:w-full sm:w-96 w-full mx-auto group flex-col justify-start items-start inline-flex">
-      <div className="w-full xl:h-[274px] h-72 p-8 bg-white rounded-2xl border border-black/20 flex-col justify-start items-start flex">
+    <div className="lg:w-full sm:w-full w-full mx-auto group flex-col justify-start items-start inline-flex">
+      <div className="w-full h-full p-4 bg-white rounded-2xl border border-black/20 flex-col justify-start items-start flex">
         <div className="w-full flex-col justify-start items-start gap-6 flex p-1">
           <div className="w-full flex-col justify-start items-start gap-2.5 flex">
             <h4 className="text-gray-800 text-xl font-medium leading-8">
@@ -169,7 +170,7 @@ function PricingPackages() {
   );
 
   return (
-    <section className="py-24 bg-white bg-no-repeat bg-cover w-full bg-center">
+    <section className=" bg-white bg-no-repeat bg-cover w-full bg-center">
       <style
         dangerouslySetInnerHTML={{
           __html: `
@@ -188,50 +189,80 @@ function PricingPackages() {
           `,
         }}
       />
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl ">
         <div className="w-full flex-col justify-start items-start lg:gap-12 gap-10 inline-flex">
-          <div className="lg:w-full sm:w-96 w-full mx-auto flex-col justify-start items-center gap-3.5 flex">
-            <div className="w-fit px-4 py-2 bg-black/opacity-10 rounded-full border border-orange-500 justify-center items-center gap-2 inline-flex">
-              <span className="text-center text-black text-xs font-normal leading-tight">
-                Pricing Plans
-              </span>
-            </div>
-            <h2 className="text-center text-gray-800 text-3xl font-bold font-manrope leading-normal">
-              We Have Got A Perfect Pricing Plan
-            </h2>
-            <p className="lg:max-w-4xl w-full text-center text-gray-800 opacity-50 text-base font-normal leading-relaxed">
-              Discover our range of pricing plans and select the option that
-              aligns perfectly with your needs. Whether you prefer flexibility
-              or comprehensive coverage.
-            </p>
-            <div className="flex items-center justify-center gap-4">
-              <label
-                className={`toggler text-xl font-medium leading-8 ${
-                  !isMonthly ? "!text-black" : "!text-gray-500"
-                }`}
-                onClick={() => setIsMonthly(false)}
-              >
-                Bill Yearly
-              </label>
-              <div className="toggle">
-                <input
-                  type="checkbox"
-                  id="switcher"
-                  className="check"
-                  checked={isMonthly}
-                  onChange={togglePricing}
-                />
-                <span className="b switch" />
+          {!userPage && (
+            <div className="  lg:w-full sm:w-96 w-full mx-auto flex-col justify-start items-center gap-3.5 flex">
+              <div className="w-fit px-4 py-2 bg-black/opacity-10 rounded-full border border-orange-500 justify-center items-center gap-2 inline-flex">
+                <span className="text-center text-black text-xs font-normal leading-tight">
+                  Pricing Plans
+                </span>
               </div>
-              <label
-                className={`toggler text-xl font-medium leading-8 ${
-                  isMonthly ? "!text-black" : "!text-gray-500"
-                }`}
-                onClick={() => setIsMonthly(true)}
-              >
-                Bill Monthly
-              </label>
+              <h2 className="text-center text-gray-800 text-3xl font-bold font-manrope leading-normal">
+                We Have Got A Perfect Pricing Plan
+              </h2>
+              <p className="lg:max-w-4xl w-full text-center text-gray-800 opacity-50 text-base font-normal leading-relaxed">
+                Discover our range of pricing plans and select the option that
+                aligns perfectly with your needs. Whether you prefer flexibility
+                or comprehensive coverage.
+              </p>
+              <div className="flex items-center justify-center gap-4">
+                <label
+                  className={`toggler text-xl font-medium leading-8 ${
+                    !isMonthly ? "!text-black" : "!text-gray-500"
+                  }`}
+                  onClick={() => setIsMonthly(false)}
+                >
+                  Bill Yearly
+                </label>
+                <div className="toggle">
+                  <input
+                    type="checkbox"
+                    id="switcher"
+                    className="check"
+                    checked={isMonthly}
+                    onChange={togglePricing}
+                  />
+                  <span className="b switch" />
+                </div>
+                <label
+                  className={`toggler text-xl font-medium leading-8 ${
+                    isMonthly ? "!text-black" : "!text-gray-500"
+                  }`}
+                  onClick={() => setIsMonthly(true)}
+                >
+                  Bill Monthly
+                </label>
+              </div>
             </div>
+          )}
+          <div className="flex items-center justify-center gap-4">
+            <label
+              className={`toggler text-xl font-medium leading-8 ${
+                !isMonthly ? "!text-black" : "!text-gray-500"
+              }`}
+              onClick={() => setIsMonthly(false)}
+            >
+              Bill Yearly
+            </label>
+            <div className="toggle">
+              <input
+                type="checkbox"
+                id="switcher"
+                className="check"
+                checked={isMonthly}
+                onChange={togglePricing}
+              />
+              <span className="b switch" />
+            </div>
+            <label
+              className={`toggler text-xl font-medium leading-8 ${
+                isMonthly ? "!text-black" : "!text-gray-500"
+              }`}
+              onClick={() => setIsMonthly(true)}
+            >
+              Bill Monthly
+            </label>
           </div>
           <div className="w-full">
             <div

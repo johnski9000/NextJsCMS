@@ -16,6 +16,7 @@ import {
   Box,
 } from "@mantine/core";
 import Image from "next/image";
+import Link from "next/link";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -71,7 +72,9 @@ export default function SignupPage() {
   return (
     <Box className="bg-black h-screen w-screen flex flex-col items-center justify-center">
       <Title c="orange">
-        <Image src="/mobileLogo.png" alt="Logo" width={100} height={100} />
+        <Link href="/">
+          <Image src="/mobileLogo.png" alt="Logo" width={100} height={100} />
+        </Link>
       </Title>
       {error && (
         <Alert color="red" mt={10} radius="md">

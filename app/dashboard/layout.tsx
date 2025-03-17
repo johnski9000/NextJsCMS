@@ -13,6 +13,7 @@ export default async function DashboardLayout({
   return (
     <div className="relative bg-gray-900 min-h-screen text-white">
       {/* Pass session to the client-side wrapper */}
+
       <LayoutWrapper session={session}>{children}</LayoutWrapper>
     </div>
   );

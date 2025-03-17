@@ -19,6 +19,7 @@ import {
 } from "@mantine/core";
 import { FaGoogle, FaSignInAlt } from "react-icons/fa";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -50,7 +51,9 @@ export default function LoginPage() {
   return (
     <Box className="bg-black h-screen w-screen flex flex-col items-center justify-center">
       <Title align="center" c="orange">
-        <Image src="/mobileLogo.png" alt="Logo" width={100} height={100} />
+        <Link href="/">
+          <Image src="/mobileLogo.png" alt="Logo" width={100} height={100} />
+        </Link>
       </Title>
       {error && (
         <Alert color="red" mt={10} radius="md">

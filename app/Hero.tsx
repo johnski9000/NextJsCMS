@@ -1,10 +1,10 @@
-import Image from 'next/image'
-import React from 'react'
+import Image from "next/image";
+import React from "react";
 
 function Hero() {
   return (
     <div className="bg-[url('https://pagedone.io/asset/uploads/1719484344.png')] bg-no-repeat bg-cover w-full bg-center">
-    <section className="w-full lg:pt-[84px]">
+      <section className="w-full lg:pt-[84px]">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="w-full flex-col justify-start items-start gap-14 pt-14 inline-flex">
             <div className="w-full flex-col justify-start items-center lg:gap-28 gap-16 flex">
@@ -20,7 +20,7 @@ function Hero() {
                   </h2>
                   <p className="lg:max-w-lg w-full text-center text-white text-base font-normal leading-relaxed">
                     Optimize Operations, Elevate Performance. Unlock Your
-                    Team's Full Potential with Seamless Workflow Solutions.
+                    Team&apos;s Full Potential with Seamless Workflow Solutions.
                   </p>
                 </div>
                 <div className="w-full justify-center items-start gap-3 flex sm:flex-row flex-col">
@@ -47,8 +47,8 @@ function Hero() {
           </div>
         </div>
       </section>
-
-    </div>  )
+    </div>
+  );
 }
 
-export default Hero
+export default Hero;

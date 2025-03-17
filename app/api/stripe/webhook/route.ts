@@ -109,6 +109,7 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
         stripe_subscription_id: subscription.id,
         status,
         price_id: priceId,
+        current_period_start: new Date().toISOString(),
         current_period_end: currentPeriodEnd,
       },
     ]);

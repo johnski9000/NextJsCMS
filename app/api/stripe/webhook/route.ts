@@ -63,31 +63,64 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
   // Ensure correct plan selection
   const priceId = subscription.items.data[0]?.price.id;
   const status = subscription.status;
+  const currentPeriodEnd = new Date(
+    subscription.current_period_end * 1000
+  ).toISOString();
 
   console.log(
     `📌 Updating subscription: ${subscription.id}, Status: ${status}`
   );
 
-  // Update or Insert the Subscription
-  const { error: subError } = await supabase.from("subscriptions").upsert(
-    [
+  // Check if subscription already exists
+  const { data: existingSubscription, error: fetchError } = await supabase
+    .from("subscriptions")
+    .select("id")
+    .eq("stripe_subscription_id", subscription.id)
+    .single();
+
+  if (fetchError) {
+    console.error("⚠️ Error fetching subscription:", fetchError);
+  }
+
+  if (existingSubscription) {
+    // ✅ Update existing subscription
+    const { error: updateError } = await supabase
+      .from("subscriptions")
+      .update({
+        status,
+        price_id: priceId,
+        current_period_end: currentPeriodEnd,
+      })
+      .eq("stripe_subscription_id", subscription.id);
+
+    if (updateError) {
+      console.error(
+        "❌ Failed to update subscription in Supabase:",
+        updateError
+      );
+    } else {
+      console.log("✅ Subscription successfully updated in Supabase");
+    }
+  } else {
+    // ✅ Insert new subscription
+    const { error: insertError } = await supabase.from("subscriptions").insert([
       {
         user_id: user.id,
         stripe_subscription_id: subscription.id,
         status,
         price_id: priceId,
-        current_period_end: new Date(
-          subscription.current_period_end * 1000
-        ).toISOString(),
+        current_period_end: currentPeriodEnd,
       },
-    ],
-    { onConflict: "user_id" } // Remove array, use a string instead
-  );
+    ]);
 
-  if (subError) {
-    console.error("❌ Failed to update subscription in Supabase:", subError);
-  } else {
-    console.log("✅ Subscription successfully updated in Supabase");
+    if (insertError) {
+      console.error(
+        "❌ Failed to insert new subscription in Supabase:",
+        insertError
+      );
+    } else {
+      console.log("✅ New subscription successfully added to Supabase");
+    }
   }
 }
 

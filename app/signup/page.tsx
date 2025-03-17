@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@supabase/supabase-js";
 import {
   Button,
@@ -28,12 +28,15 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const selectedPlan = searchParams.get("plan");
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
+    // Sign up with Supabase
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -45,13 +48,29 @@ export default function SignupPage() {
       return;
     }
 
-    await signIn("credentials", { email, password, redirect: false });
-    router.push("/dashboard"); // Changed to /dashboard to match login flow
+    // Automatically log in user with NextAuth
+    const user = await signIn("credentials", {
+      email,
+      password,
+      redirect: false,
+    });
+    if (user?.error) {
+      setError(user.error);
+      setLoading(false);
+      return;
+    }
+
+    // Redirect user based on plan selection
+    if (selectedPlan) {
+      router.push(`/dashboard/checkout?plan=${selectedPlan}`);
+    } else {
+      router.push("/dashboard");
+    }
   };
 
   return (
     <Box className="bg-black h-screen w-screen flex flex-col items-center justify-center">
-      <Title align="center" c="orange">
+      <Title c="orange">
         <Image src="/mobileLogo.png" alt="Logo" width={100} height={100} />
       </Title>
       {error && (
@@ -96,7 +115,7 @@ export default function SignupPage() {
             Sign Up
           </Button>
         </form>
-        <Text align="center" size="sm" mt="md" c="white">
+        <Text className="text-center" size="sm" mt="md" c="white">
           Already have an account?{" "}
           <Anchor href="/login" c="orange">
             Log in here

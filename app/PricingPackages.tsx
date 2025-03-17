@@ -1,100 +1,107 @@
-import React, { useState } from 'react';
+import { useSession } from "next-auth/react";
+import Link from "next/link";
+import React, { useState } from "react";
 
 function PricingPackages() {
   const [isMonthly, setIsMonthly] = useState(true);
-
+  const { data: session, status } = useSession();
+  console.log("Session", session);
   const togglePricing = () => setIsMonthly(!isMonthly);
 
   const monthlyPackages = [
     {
-      title: "Basic Plan",
-      description: "Perfect for individuals just getting started",
-      price: "$0",
+      title: "Starter Plan",
+      description: "Perfect for getting started",
+      price: "£9.99",
       period: "Per Month",
+      stripeID: "prod_Rws4heO15q7ZRn",
       features: [
-        "Security Lock Feature",
-        "Collaboration for 2 Accounts",
-        "2 Active Open Jobs",
-        "1 Recruitment Board",
-        "Basic Reporting Tools",
-        "Standard Platform Features"
-      ]
+        "1 Website",
+        "1 Page",
+        "Basic SEO",
+        "Email Support",
+        "Fast CDN Hosting",
+      ],
     },
     {
-      title: "Professional Plan",
-      description: "Ideal for growing teams and businesses",
-      price: "$29",
+      title: "Business Plan",
+      description: "Ideal for small to medium businesses",
+      price: "£19.99",
       period: "Per Month",
       features: [
-        "Advanced Security Features",
-        "Collaboration for 5 Accounts",
-        "10 Active Open Jobs",
-        "3 Recruitment Boards",
-        "Advanced Reporting Tools",
-        "Premium Platform Features"
-      ]
+        "3 Websites",
+        "5 Pages per site",
+        "Advanced SEO",
+        "Priority Email Support",
+        "Performance Optimizations",
+      ],
     },
     {
-      title: "Enterprise Plan",
-      description: "Comprehensive solution for large organizations",
-      price: "$99",
+      title: "Pro Plan",
+      description: "Unlimited potential for growing businesses",
+      price: "£29.99",
       period: "Per Month",
       features: [
-        "Enterprise Security Suite",
-        "Unlimited Collaborators",
-        "Unlimited Active Jobs",
-        "Unlimited Recruitment Boards",
-        "Advanced Analytics Dashboard",
-        "All Platform Features"
-      ]
-    }
+        "Unlimited Websites",
+        "Unlimited Pages",
+        "Premium SEO",
+        "Priority Support",
+        "Enhanced Performance Optimizations",
+      ],
+    },
   ];
 
   const yearlyPackages = [
     {
-      title: "Basic Plan",
-      description: "Perfect for individuals just getting started",
-      price: "$0",
+      title: "Starter Plan",
+      description: "Perfect for individuals starting their online presence",
+      price: "£99",
       period: "Per Year",
       features: [
-        "Security Lock Feature",
-        "Collaboration for 2 Accounts",
-        "2 Active Open Jobs",
-        "1 Recruitment Board",
-        "Basic Reporting Tools",
-        "Standard Platform Features"
-      ]
+        "1 Website",
+        "1 Page",
+        "Basic SEO Optimization",
+        "Basic CDN Hosting",
+        "Email Support",
+      ],
     },
     {
-      title: "Professional Plan",
-      description: "Ideal for growing teams and businesses",
-      price: "$290",
+      title: "Business Plan",
+      description: "Best for growing businesses with multiple websites",
+      price: "£199",
       period: "Per Year",
       features: [
-        "Advanced Security Features",
-        "Collaboration for 5 Accounts",
-        "10 Active Open Jobs",
-        "3 Recruitment Boards",
-        "Advanced Reporting Tools",
-        "Premium Platform Features"
-      ]
+        "Up to 5 Websites",
+        "Up to 5 Pages per Website",
+        "Advanced SEO Tools",
+        "Enhanced CDN Hosting",
+        "Priority Support",
+        "Website Analytics",
+      ],
     },
     {
-      title: "Enterprise Plan",
-      description: "Comprehensive solution for large organizations",
-      price: "$990",
+      title: "Pro Plan",
+      description: "Ideal for businesses needing unlimited flexibility",
+      price: "£299",
       period: "Per Year",
       features: [
-        "Enterprise Security Suite",
-        "Unlimited Collaborators",
-        "Unlimited Active Jobs",
-        "Unlimited Recruitment Boards",
-        "Advanced Analytics Dashboard",
-        "All Platform Features"
-      ]
-    }
+        "Unlimited Websites",
+        "Unlimited Pages",
+        "Comprehensive SEO Suite",
+        "Global CDN Hosting",
+        "Dedicated Support",
+        "Advanced Website Analytics",
+        "Custom Domain Support",
+      ],
+    },
   ];
-
+  const handleClick = (plan: { stripeID: string }) => {
+    if (session) {
+      return `/checkout/${plan.stripeID}`;
+    } else {
+      return `/signup?plan=${plan.stripeID}`;
+    }
+  };
   const PricingCard = ({ plan }) => (
     <div className="lg:w-full sm:w-96 w-full mx-auto group flex-col justify-start items-start inline-flex">
       <div className="w-full xl:h-[274px] h-72 p-8 bg-white rounded-2xl border border-black/20 flex-col justify-start items-start flex">
@@ -115,11 +122,13 @@ function PricingPackages() {
               </h6>
             </div>
           </div>
-          <button className="w-full px-3.5 py-2 bg-gradient-to-b from-gray-700 to-gray-900 transition-all duration-700 ease-in-out rounded-full shadow-[0px_1px_2px_0px_rgba(16,_24,_40,_0.05)] justify-center items-center flex">
-            <span className="px-1.5 text-white text-sm font-medium leading-6">
-              Get Started
-            </span>
-          </button>
+          <Link href={handleClick(plan)}>
+            <button className="w-full px-3.5 py-2 bg-gradient-to-b from-gray-700 to-gray-900 transition-all duration-700 ease-in-out rounded-full shadow-[0px_1px_2px_0px_rgba(16,_24,_40,_0.05)] justify-center items-center flex">
+              <span className="px-1.5 text-white text-sm font-medium leading-6">
+                Get Started
+              </span>
+            </button>
+          </Link>
         </div>
       </div>
       <div className="w-full pricingCard-frame relative px-8 pt-3 justify-start items-center inline-flex">
@@ -176,7 +185,7 @@ function PricingPackages() {
             .pricingCard-frame:before { content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0; border-radius: 0px 0px 16px 16px; padding: 1px; background: linear-gradient(0deg, #E5E7EB -40.41%, #FFFFFF 100%); -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: destination-out; mask-composite: exclude; transition: all .6s ease-in-out; width: 100%; height: 100%; }
             .pricingCard-frame:hover { background: linear-gradient(180deg, rgba(186, 222, 255, 0.00) 1.56%, rgba(186, 222, 255, 0.10) 100%); }
             .pricingCard-frame:hover:before { background: linear-gradient(0deg, #6366f1cc 10.41%, #ffffff 90%); }
-          `
+          `,
         }}
       />
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -197,7 +206,9 @@ function PricingPackages() {
             </p>
             <div className="flex items-center justify-center gap-4">
               <label
-                className={`toggler text-xl font-medium leading-8 ${!isMonthly ? '!text-black' : '!text-gray-500'}`}
+                className={`toggler text-xl font-medium leading-8 ${
+                  !isMonthly ? "!text-black" : "!text-gray-500"
+                }`}
                 onClick={() => setIsMonthly(false)}
               >
                 Bill Yearly
@@ -213,7 +224,9 @@ function PricingPackages() {
                 <span className="b switch" />
               </div>
               <label
-                className={`toggler text-xl font-medium leading-8 ${isMonthly ? '!text-black' : '!text-gray-500'}`}
+                className={`toggler text-xl font-medium leading-8 ${
+                  isMonthly ? "!text-black" : "!text-gray-500"
+                }`}
                 onClick={() => setIsMonthly(true)}
               >
                 Bill Monthly
@@ -224,9 +237,11 @@ function PricingPackages() {
             <div
               className={`justify-start items-center xl:gap-8 gap-6 grid lg:grid-cols-3 grid-cols-1`}
             >
-              {(isMonthly ? monthlyPackages : yearlyPackages).map((plan, index) => (
-                <PricingCard key={index} plan={plan} />
-              ))}
+              {(isMonthly ? monthlyPackages : yearlyPackages).map(
+                (plan, index) => (
+                  <PricingCard key={index} plan={plan} />
+                )
+              )}
             </div>
           </div>
         </div>

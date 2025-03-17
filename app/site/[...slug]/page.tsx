@@ -1,9 +1,9 @@
 import { notFound } from "next/navigation";
-import ComponentMap from "../components/ComponentMaps/ComponentMap";
-import Sidebar from "../components/AdminSidebar/Sidebar";
+import ComponentMap from "@/app/components/ComponentMaps/ComponentMap";
+import Sidebar from "@/app/components/AdminSidebar/Sidebar";
 import { getServerSession } from "next-auth";
-import DynamicNavigation from "../components/DynamicNavigation";
-import DynamicFooter from "../components/DynamicFooter";
+import DynamicNavigation from "@/app/components/DynamicNavigation";
+import DynamicFooter from "@/app/components/DynamicFooter";
 
 // Fetch page data
 async function getPageData(slug: string) {

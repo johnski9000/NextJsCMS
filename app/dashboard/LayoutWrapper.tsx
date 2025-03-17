@@ -1,71 +1,110 @@
-"use client";
+"use client"; // Mark as client-side
 
-import { Button, Drawer } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
-import { useSession } from "next-auth/react";
-import Image from "next/image";
-import Link from "next/link";
+import { useState, useEffect } from "react";
+import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { MdDashboard } from "react-icons/md";
-import PricingPackages from "./PricingPackages";
-import Hero from "./Hero";
+import { loadStripe } from "@stripe/stripe-js";
+import { Button } from "@mantine/core";
+import { Drawer } from "@mantine/core";
+import Link from "next/link";
+import { useDisclosure } from "@mantine/hooks";
+import Image from "next/image";
+import { IoMdAdd } from "react-icons/io";
 
-export default function Home() {
-  const [isProductsOpen, setIsProductsOpen] = useState(false);
-  const [isFeaturesOpen, setIsFeaturesOpen] = useState(false);
-  const [isMonthly, setIsMonthly] = useState(true); // State for pricing toggle
-  const [opened, { open, close }] = useDisclosure(false);
+const stripePromise = loadStripe(
+  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
+);
+
+interface LayoutWrapperProps {
+  children: React.ReactNode;
+  session: any; // Use your session type from next-auth.d.ts
+}
+
+export default function LayoutWrapper({
+  children,
+  session: initialSession,
+}: LayoutWrapperProps) {
+  const { data: session, status } = useSession(); // Still use useSession for client-side updates
   const [loading, setLoading] = useState(false);
   const [signOutLoading, setSignOutLoading] = useState(false);
-  const { data: session, status } = useSession();
-  console.log("Session:", session?.user?.id, session?.stripeCustomerId);
+  const [error, setError] = useState("");
   const router = useRouter();
-  const togglePricing = () => setIsMonthly(!isMonthly);
+  const [scrolled] = useState(false); // Add scroll logic if needed
+  const [opened, { open, close }] = useDisclosure(false);
+
+  // Use initialSession from server if client-side session isn’t ready
+  const effectiveSession = session || initialSession;
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/login");
+    }
+  }, [status, router]);
+
+  const handleStripeCheckout = async () => {
+    setLoading(true);
+    setError("");
+    // Add your Stripe checkout logic here if needed
+    setLoading(false);
+  };
+
+  const handleSignOut = async () => {
+    setSignOutLoading(true);
+    setError("");
+    try {
+      await signOut({ redirect: false });
+      router.push("/login");
+    } catch (err) {
+      setError("Sign-out failed: " + (err as Error).message);
+      setSignOutLoading(false);
+    }
+  };
+
+  if (status === "loading" && !effectiveSession) {
+    return <div className="text-white">Loading...</div>;
+  }
+
   const menuItems = [
     { href: "/dashboard/websites", label: "My Websites" },
     { href: "/dashboard/subscriptions", label: "Subscriptions" },
     { href: "/dashboard/settings", label: "Settings" },
     { href: "/dashboard/support", label: "Support" },
   ];
-  const scrolled = true;
-  const handleStripeCheckout = () => {};
-  const handleSignOut = () => {};
+
   return (
-    <div className="min-h-screen">
-      {/* Navigation Section */}{" "}
+    <>
       <nav
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           scrolled ? "bg-black/60 backdrop-blur-md shadow-md" : "bg-black"
-        } `}
+        }`}
       >
         <div className="max-w-[1440px] mx-auto flex flex-wrap items-center justify-between p-4">
-          {/* Logo */}
           <Link href="/" className="flex items-center space-x-3">
             <Image src="/newLogo.png" alt="Logo" width={120} height={40} />
           </Link>
 
-          {/* CTA Button + Mobile Toggle */}
           <div className="flex md:order-2 space-x-3">
-            <Link href="/dashboard">
-              <Button
-                onClick={handleStripeCheckout}
-                className="!hidden md:!block !font-medium text-sm px-4 py-2 !text-black !bg-orange-500"
-                color="orange"
-                variant="filled"
-                leftSection={session ? <MdDashboard size={20} /> : null}
-                disabled={loading || signOutLoading}
-                onMouseEnter={
-                  (e) => (e.currentTarget.style.backgroundColor = "#ea580c") // orange-600
-                }
-                onMouseLeave={(e) =>
-                  (e.currentTarget.style.backgroundColor = "#f97316")
-                }
-              >
-                {session ? "Dashboard" : "Get Started"}
+            <Button
+              onClick={handleStripeCheckout}
+              className="!hidden md:!block !font-medium text-sm px-4 py-2 !text-black !bg-orange-500"
+              color="orange"
+              variant="filled"
+              leftSection={<IoMdAdd className="mr-2" size={20} />}
+              disabled={loading || signOutLoading}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.backgroundColor = "#ea580c")
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.backgroundColor = "#f97316")
+              }
+            >
+              {loading ? "Processing..." : "Add A Website"}
+            </Button>
+            {effectiveSession && (
+              <Button color="red" variant="filled" onClick={handleSignOut}>
+                Log Out
               </Button>
-            </Link>
-            {/* Mobile menu toggle button */}
+            )}
             <button
               type="button"
               className="md:hidden hover:text-orange-500 p-2 focus:outline-none"
@@ -96,7 +135,6 @@ export default function Home() {
             </button>
           </div>
 
-          {/* Mobile Drawer Navigation */}
           <Drawer
             position="right"
             size={200}
@@ -113,11 +151,7 @@ export default function Home() {
                 <li key={index}>
                   <Link
                     href={item.href}
-                    className={`block py-2 px-4 rounded-sm transition-all duration-300 ${
-                      item.label === "Dashboard"
-                        ? "bg-orange-500 font-bold rounded-md hover:bg-orange-600"
-                        : "text-white hover:text-orange-500"
-                    }`}
+                    className={`block py-2 px-4 rounded-sm transition-all duration-300 text-white hover:text-orange-500`}
                   >
                     {item.label}
                   </Link>
@@ -144,7 +178,6 @@ export default function Home() {
             </ul>
           </Drawer>
 
-          {/* Desktop Navigation Links */}
           <div className="hidden md:flex md:items-center md:space-x-8">
             <ul className="flex flex-col md:flex-row md:space-x-8">
               {menuItems.map((item, index) => (
@@ -161,8 +194,8 @@ export default function Home() {
           </div>
         </div>
       </nav>
-      <Hero />
-      <PricingPackages />
-    </div>
+
+      <div className="pt-28">{children}</div>
+    </>
   );
 }

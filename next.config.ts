@@ -1,6 +1,14 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  async rewrites() {
+    return [
+      {
+        source: "/api/stripe/webhook",
+        destination: "/api/stripe/webhook",
+      },
+    ];
+  },
   typescript: {
     ignoreBuildErrors: true, // Ignores all TypeScript errors during build
   },

@@ -1,214 +1,26 @@
-"use client";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/auth"; // Adjust path (e.g., "../../auth")
 
-import { useState, useEffect } from "react";
-import { useSession, signOut } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { loadStripe } from "@stripe/stripe-js";
-import { Button } from "@mantine/core";
-import { Drawer } from "@mantine/core";
-import Link from "next/link";
-import { useDisclosure } from "@mantine/hooks";
-import Image from "next/image";
-import { IoMdAdd } from "react-icons/io";
-const stripePromise = loadStripe(
-  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
-);
-
-export default function DashboardPage() {
-  const { data: session, status } = useSession();
-  const [loading, setLoading] = useState(false);
-  const [signOutLoading, setSignOutLoading] = useState(false);
-  const [error, setError] = useState("");
-  const router = useRouter();
-  const [scrolled] = useState(false); // You might want to add scroll logic if needed
-  const [opened, { open, close }] = useDisclosure(false);
-
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/login");
-    }
-  }, [status, router]);
-
-  const handleStripeCheckout = async () => {
-    setLoading(true);
-    setError("");
-    // ... (keeping the existing Stripe checkout logic from previous code)
-  };
-
-  const handleSignOut = async () => {
-    setSignOutLoading(true);
-    setError("");
-    try {
-      await signOut({ redirect: false });
-      router.push("/login");
-    } catch (err) {
-      setError("Sign-out failed: " + (err as Error).message);
-      setSignOutLoading(false);
-    }
-  };
-
-  if (status === "loading") return <div className="text-white">Loading...</div>;
-
-  // Navigation menu items
-  const menuItems = [
-    { href: "/dashboard/websites", label: "My Websites" },
-    { href: "/dashboard/subscriptions", label: "Subscriptions" },
-    { href: "/dashboard/settings", label: "Settings" },
-    { href: "/dashboard/support", label: "Support" },
-  ];
+export default async function DashboardPage() {
+  const session = await getServerSession(authOptions);
 
   return (
-    <div className="relative bg-gray-900 min-h-screen text-white">
-      <nav
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          scrolled ? "bg-black/60 backdrop-blur-md shadow-md" : "bg-black"
-        } `}
-      >
-        <div className="max-w-[1440px] mx-auto flex flex-wrap items-center justify-between p-4">
-          {/* Logo */}
-          <Link href="/" className="flex items-center space-x-3">
-            <Image src="/newLogo.png" alt="Logo" width={120} height={40} />
-          </Link>
-
-          {/* CTA Button + Mobile Toggle */}
-          <div className="flex md:order-2 space-x-3">
-            <Button
-              onClick={handleStripeCheckout}
-              className="!hidden md:!block !font-medium text-sm px-4 py-2 !text-black !bg-orange-500"
-              color="orange"
-              variant="filled"
-              leftSection={<IoMdAdd className="mr-2" size={20} />}
-              disabled={loading || signOutLoading}
-              onMouseEnter={
-                (e) => (e.currentTarget.style.backgroundColor = "#ea580c") // orange-600
-              }
-              onMouseLeave={(e) =>
-                (e.currentTarget.style.backgroundColor = "#f97316")
-              }
-            >
-              {loading ? "Processing..." : "Add A Website"}
-            </Button>
-            {/* Mobile menu toggle button */}
-            <button
-              type="button"
-              className="md:hidden hover:text-orange-500 p-2 focus:outline-none"
-              onClick={open}
-            >
-              <svg
-                className="w-6 h-6 text-orange-200"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                {opened ? (
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                ) : (
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M4 6h16M4 12h16m-7 6h7"
-                  />
-                )}
-              </svg>
-            </button>
-          </div>
-
-          {/* Mobile Drawer Navigation */}
-          <Drawer
-            position="right"
-            size={200}
-            opened={opened}
-            onClose={close}
-            title={<img src="/logo.png" className="h-24" alt="Logo" />}
-            styles={{
-              content: { backgroundColor: "#0a0a0a", color: "white" },
-              header: { backgroundColor: "#0a0a0a", color: "white" },
-            }}
-          >
-            <ul className="flex flex-col items-center space-y-4">
-              {menuItems.map((item, index) => (
-                <li key={index}>
-                  <Link
-                    href={item.href}
-                    className={`block py-2 px-4 rounded-sm transition-all duration-300 ${
-                      item.label === "Dashboard"
-                        ? "bg-orange-500 font-bold rounded-md hover:bg-orange-600"
-                        : "text-white hover:text-orange-500"
-                    }`}
-                  >
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
-              <Button
-                onClick={handleSignOut}
-                className="!font-medium text-sm px-4 py-2 !text-black !bg-orange-500"
-                style={{
-                  backgroundColor: "#f97316",
-                  borderRadius: "8px",
-                  transition: "background-color 0.3s",
-                }}
-                disabled={signOutLoading}
-                onMouseEnter={(e) =>
-                  (e.currentTarget.style.backgroundColor = "#ea580c")
-                }
-                onMouseLeave={(e) =>
-                  (e.currentTarget.style.backgroundColor = "#f97316")
-                }
-              >
-                {signOutLoading ? "Signing Out..." : "Logout"}
-              </Button>
-            </ul>
-          </Drawer>
-
-          {/* Desktop Navigation Links */}
-          <div className="hidden md:flex md:items-center md:space-x-8">
-            <ul className="flex flex-col md:flex-row md:space-x-8">
-              {menuItems.map((item, index) => (
-                <li key={index}>
-                  <a
-                    href={item.href}
-                    className="block py-2 px-4 text-white rounded-sm transition-all duration-300 hover:text-orange-500"
-                  >
-                    {item.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </nav>
-
-      <div className="pt-28">
-        <div className="py-4 min-h-screen px-8 bg-gray-900 border-b border-orange-500/20">
-          <h6 className="text-lg font-semibold text-white">
-            Welcome back,{" "}
-            <span className="text-orange-500">
-              {session?.user?.name || "User"}!
-            </span>
-          </h6>
-          <p className="text-sm text-orange-200">Dashboard</p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-8">
-              <div className="border border-orange-500/30 rounded-xl shadow-md shadow-orange-500/10 overflow-hidden">
-                <Image src="/dashboard-placeholder.png" alt="Dashboard Placeholder" width={500} height={300} />
-                </div>
-            </div>
-        </div>
-
-        <div className="w-full p-8">
-          <div className="border border-orange-500/30 rounded-xl shadow-md shadow-orange-500/10 overflow-hidden">
-            <img
-              src="/dashboard-placeholder.png"
-              alt="Dashboard Placeholder"
-              className="w-full"
-            />
-          </div>
+    <div className="py-4 min-h-screen px-8 bg-gray-900 border-b border-orange-500/20">
+      <h6 className="text-lg font-semibold text-white">
+        Welcome back,{" "}
+        <span className="text-orange-500">
+          {session?.user?.name || "User"}! <br /> stripe id -
+          {session?.stripeCustomerId}
+        </span>
+      </h6>
+      <p className="text-sm text-orange-200">Dashboard</p>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-8">
+        <div className="border border-orange-500/30 rounded-xl shadow-md shadow-orange-500/10 overflow-hidden">
+          <img
+            src="/dashboard-placeholder.png"
+            alt="Dashboard Placeholder"
+            className="w-full"
+          />
         </div>
       </div>
     </div>

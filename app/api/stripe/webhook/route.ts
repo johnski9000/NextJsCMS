@@ -118,8 +118,8 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
         status,
         price_id: priceId,
         product_id: productId, // New field ✅
-        current_period_start,
-        current_period_end,
+        current_period_start: currentPeriodStart,
+        current_period_end: currentPeriodEnd,
         created_at: new Date().toISOString(),
       },
     ]);

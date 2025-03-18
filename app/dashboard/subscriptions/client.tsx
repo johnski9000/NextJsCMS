@@ -12,6 +12,7 @@ import React from "react";
 import { subscriptions } from "@/app/utils/subscriptions";
 import { format } from "date-fns";
 import AdditionalWebsite from "./AdditionalWebsite";
+import PricingPackages from "@/app/PricingPackages";
 function Subscriptions({ session, currentProduct }) {
   const stripeId = session?.stripeCustomerId || "";
 
@@ -30,16 +31,15 @@ function Subscriptions({ session, currentProduct }) {
   console.log("Current Product:", currentProduct);
   const hasSubscription = currentProduct?.status === "active" ? true : false;
 
+  const currentSubscription = subscriptions.find(
+    (sub) => sub.productId === currentProduct?.product_id
+  );
   const scrollDown = () => {
     window.scrollTo({
       top: 250,
       behavior: "smooth",
     });
   };
-
-  const currentSubscription = subscriptions.find(
-    (sub) => sub.productId === currentProduct?.product_id
-  );
 
   return (
     <div className="bg-white min-h-screen">
@@ -106,24 +106,26 @@ function Subscriptions({ session, currentProduct }) {
                 Need an upgrade?
               </Button>
             </Card>
-            <AdditionalWebsite session={session} />
+            <AdditionalWebsite
+              session={session}
+              currentProduct={currentProduct}
+            />
           </div>
         ) : (
-          <Card shadow="sm" padding="lg" radius="md" withBorder mb="xl">
-            <Text size="lg" fw={500} mb="md">
-              No Active Subscription
-            </Text>
-            <Text c="gray" size="sm" mb="md">
-              You currently don&apos;t have an active subscription plan.
-            </Text>
-            <Button
-              color="blue"
-              variant="light"
-              onClick={() => handleManageSubscription()}
-            >
-              Choose a Plan Below
-            </Button>
-          </Card>
+          <>
+            <Card shadow="sm" padding="lg" radius="md" withBorder mb="xl">
+              <Text size="lg" fw={500} mb="md">
+                No Active Subscription
+              </Text>
+              <Text c="gray" size="sm" mb="md">
+                You currently don&apos;t have an active subscription plan.
+              </Text>
+              <Button color="blue" variant="light" onClick={() => scrollDown()}>
+                Choose a Plan Below
+              </Button>
+            </Card>
+            <PricingPackages userPage={true} />
+          </>
         )}
       </Container>
     </div>

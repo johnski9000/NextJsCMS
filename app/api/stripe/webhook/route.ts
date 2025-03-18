@@ -41,7 +41,7 @@ export async function POST(req: Request) {
 
 /**
  * Handles subscription creation and updates.
- * Ensures Supabase syncs with Stripe subscription data.
+ * Syncs Stripe subscription data (including multiple items) with Supabase.
  */
 async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
   const customerId = subscription.customer as string;
@@ -61,8 +61,6 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
   }
 
   // 2️⃣ Extract subscription details
-  const priceId = subscription.items.data[0]?.price.id;
-  const productId = subscription.items.data[0]?.price.product as string;
   const status = subscription.status;
   const currentPeriodStart = new Date(
     subscription.current_period_start * 1000
@@ -71,8 +69,17 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
     subscription.current_period_end * 1000
   ).toISOString();
 
+  // Extract all items (main plan + add-ons)
+  const items = subscription.items.data.map((item) => ({
+    price_id: item.price.id,
+    product_id: item.price.product as string,
+    quantity: item.quantity || 1,
+  }));
+
   console.log(
-    `📌 Updating subscription: ${subscription.id}, Status: ${status}, Product ID: ${productId}`
+    `📌 Updating subscription: ${
+      subscription.id
+    }, Status: ${status}, Items: ${JSON.stringify(items)}`
   );
 
   // 3️⃣ Check if the subscription already exists
@@ -80,9 +87,6 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
     .from("subscriptions")
     .select("id")
     .eq("stripe_subscription_id", subscription.id)
-    .eq("user_id", user.id)
-    .eq("price_id", priceId)
-    .eq("product_id", productId)
     .single();
 
   if (fetchError && fetchError.code !== "PGRST116") {
@@ -97,10 +101,10 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
       .from("subscriptions")
       .update({
         status,
-        price_id: priceId,
-        product_id: productId, // New field ✅
+        items, // Store all items as JSON
         current_period_start: currentPeriodStart,
         current_period_end: currentPeriodEnd,
+        updated_at: new Date().toISOString(),
       })
       .eq("stripe_subscription_id", subscription.id);
 
@@ -119,8 +123,7 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
         user_id: user.id,
         stripe_subscription_id: subscription.id,
         status,
-        price_id: priceId,
-        product_id: productId, // New field ✅
+        items, // Store all items as JSON
         current_period_start: currentPeriodStart,
         current_period_end: currentPeriodEnd,
         created_at: new Date().toISOString(),
@@ -140,7 +143,7 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
 
 /**
  * Handles subscription cancellation.
- * Updates user status in Supabase.
+ * Updates subscription status in Supabase.
  */
 async function handleSubscriptionCancel(subscription: Stripe.Subscription) {
   const customerId = subscription.customer as string;
@@ -166,7 +169,7 @@ async function handleSubscriptionCancel(subscription: Stripe.Subscription) {
   const { error: cancelError } = await supabase
     .from("subscriptions")
     .update({ status: "canceled" })
-    .eq("user_id", user.id);
+    .eq("stripe_subscription_id", subscription.id);
 
   if (cancelError) {
     console.error(

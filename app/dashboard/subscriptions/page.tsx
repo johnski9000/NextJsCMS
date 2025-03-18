@@ -28,18 +28,16 @@ async function Page() {
   console.log("User session:", session);
   try {
     // Fetch subscription details
-    const checkSubscriptionResponse = await axios.post(
-      "http://localhost:3000/api/subscription/current",
-      {
+    const checkSubscriptionResponse = await axios
+      .post("http://localhost:3000/api/subscription/current", {
         userId: session?.user.id,
-      }
-    );
+      })
+      .catch((error) => {
+        console.log("❌ Error fetching subscription details:", error);
+        return null;
+      });
 
-    const checkSubscription = checkSubscriptionResponse.data; // Use .data instead of .json()
-
-    console.log("Subscription details:", checkSubscription);
-
-    // Log for debugging
+    const checkSubscription = checkSubscriptionResponse?.data; // Use .data instead of .json()
 
     // Render component
     return (

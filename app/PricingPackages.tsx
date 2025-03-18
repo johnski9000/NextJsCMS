@@ -9,11 +9,11 @@ function PricingPackages({ userPage = false }) {
   const { data: session, status } = useSession();
   const togglePricing = () => setIsMonthly(!isMonthly);
 
-  const handleClick = (plan: { stripeID: string }) => {
+  const handleClick = (plan: { productId: string }) => {
     if (session) {
-      return `/dashboard/checkout?plan=${plan.stripeID}`;
+      return `/dashboard/checkout?plan=${plan.productId}`;
     } else {
-      return `/signup?plan=${plan.stripeID}`;
+      return `/signup?plan=${plan.productId}`;
     }
   };
   const PricingCard = ({ plan }) => (

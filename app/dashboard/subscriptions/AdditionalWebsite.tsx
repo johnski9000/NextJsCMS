@@ -9,7 +9,7 @@ import {
 } from "@mantine/core";
 import { additionalWebsite } from "@/app/utils/subscriptions";
 
-function AdditionalWebsite({ session }) {
+function AdditionalWebsite({ session, currentProduct }) {
   const [selectedPeriod, setSelectedPeriod] = useState("Per Month");
   const [quantity, setQuantity] = useState(1);
 

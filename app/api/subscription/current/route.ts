@@ -20,7 +20,12 @@ export async function POST(req: Request) {
     .select("*")
     .eq("user_id", userId)
     .single();
-  console.log("Subscription data:", error);
+  if (data === null) {
+    return NextResponse.json(
+      { error: "No subscription found" },
+      { status: 404 }
+    );
+  }
   if (error) {
     return NextResponse.json(
       { error: "Failed to get subscription" },

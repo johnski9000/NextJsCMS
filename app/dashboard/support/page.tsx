@@ -51,7 +51,6 @@ function SupportPage() {
   return (
     <div className="bg-white min-h-screen text-black">
       <Container size="lg" py="xl">
-
         <Box
           align="flex-start"
           spacing="xl"
@@ -167,10 +166,10 @@ function SupportPage() {
             <Accordion.Item value="q1">
               <Accordion.Control>How do I reset my password?</Accordion.Control>
               <Accordion.Panel>
-                To reset your password, go to the login page and click "Forgot
-                Password." Enter your email address, and we'll send you a link
-                to reset it. Follow the instructions in the email to set a new
-                password.
+                To reset your password, go to the login page and click
+                &quot;Forgot Password.&quot; Enter your email address, and
+                we&apos;ll send you a link to reset it. Follow the instructions
+                in the email to set a new password.
               </Accordion.Panel>
             </Accordion.Item>
 
@@ -181,16 +180,17 @@ function SupportPage() {
               <Accordion.Panel>
                 Our support team is available Monday through Friday, 9 AM to 5
                 PM EST. For urgent issues outside these hours, please email us,
-                and we'll respond as soon as possible.
+                and we&apos;ll respond as soon as possible.
               </Accordion.Panel>
             </Accordion.Item>
 
             <Accordion.Item value="q3">
               <Accordion.Control>How can I track my order?</Accordion.Control>
               <Accordion.Panel>
-                Once your order is shipped, you'll receive a tracking number via
-                email. You can use this number on our website's "Track Order"
-                page or directly on the carrier's site to monitor your shipment.
+                Once your order is shipped, you&apos;ll receive a tracking
+                number via email. You can use this number on our website&apos;s
+                &quot;Track Order&quot; page or directly on the carrier&apos;s
+                site to monitor your shipment.
               </Accordion.Panel>
             </Accordion.Item>
 

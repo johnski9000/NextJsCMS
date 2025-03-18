@@ -21,18 +21,6 @@ interface PriceDetails {
   };
 }
 
-// Function to fetch price details from Stripe
-async function getPriceDetails(priceId: string): Promise<PriceDetails | null> {
-  try {
-    const price = await stripe.prices.retrieve(priceId);
-    console.log("Price Details:", price);
-    return price as PriceDetails;
-  } catch (error) {
-    console.error("❌ Error fetching price:", error);
-    return null;
-  }
-}
-
 // Main page component
 async function Page() {
   // Get user session
@@ -49,24 +37,20 @@ async function Page() {
 
     const checkSubscription = checkSubscriptionResponse.data; // Use .data instead of .json()
 
-    // Fetch price details if price_id exists
-    const { product } = checkSubscription?.price_id
-      ? await getPriceDetails(checkSubscription.price_id)
-      : null;
+    console.log("Subscription details:", checkSubscription);
 
     // Log for debugging
-    console.log("Subscription:", checkSubscription);
 
     // Render component
     return (
       <div>
-        <Subscriptions session={session} currentProduct={product} />
+        <Subscriptions session={session} currentProduct={checkSubscription} />
       </div>
     );
   } catch (error) {
     console.error("❌ Error in page component:", error);
     return (
-      <div>
+      <div className="bg-white min-h-screen">
         <Subscriptions session={session} currentProduct={null} />
         <p>Error loading subscription details</p>
       </div>

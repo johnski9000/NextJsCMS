@@ -7,7 +7,6 @@ import { createTheme, MantineProvider } from "@mantine/core";
 import "@mantine/core/styles.css";
 import RefreshBoundary from "./context/RefreshBoundary";
 import { getServerSession } from "next-auth";
-import { SubscriptionProvider } from "./context/SubscriptionContext";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -65,7 +64,6 @@ const theme = createTheme({
   primaryShade: 6,
 
   defaultRadius: "md",
-
   colors: {
     blue: [
       "#E3F2FD",
@@ -92,12 +90,9 @@ export default async function RootLayout({
     <html lang="en">
       <body className={`${montserrat.className} antialiased`}>
         <AuthProvider session={session}>
-        <SubscriptionProvider>
-
           <RefreshBoundary>
             <MantineProvider theme={theme}>{children}</MantineProvider>
           </RefreshBoundary>
-        </SubscriptionProvider>
         </AuthProvider>
       </body>
     </html>

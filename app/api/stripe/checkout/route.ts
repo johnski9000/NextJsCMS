@@ -12,9 +12,8 @@ const supabase = createClient(
 );
 
 export async function POST(req: Request) {
-  console.log("Stripe Checkout Request:", req.body);
   try {
-    const { userId, productId, stripeId } = await req.json();
+    const { userId, productId, stripeId, quantity } = await req.json();
     console.log("Stripe Checkout Params:", { userId, productId, stripeId });
 
     // Validate inputs
@@ -77,7 +76,7 @@ export async function POST(req: Request) {
       line_items: [
         {
           price: priceId,
-          quantity: 1,
+          quantity: quantity ? quantity : 1,
         },
       ],
       success_url: `${process.env.NEXTAUTH_URL}/dashboard?session_id={CHECKOUT_SESSION_ID}`,

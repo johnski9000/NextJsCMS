@@ -8,11 +8,10 @@ import {
   Container,
   Button,
 } from "@mantine/core";
-import PricingPackages from "@/app/PricingPackages";
 import React from "react";
-import { useSubscription } from "@/app/context/SubscriptionContext";
-import { useSession } from "next-auth/react";
-
+import { subscriptions } from "@/app/utils/subscriptions";
+import { format } from "date-fns";
+import AdditionalWebsite from "./AdditionalWebsite";
 function Subscriptions({ session, currentProduct }) {
   const stripeId = session?.stripeCustomerId || "";
 
@@ -29,7 +28,7 @@ function Subscriptions({ session, currentProduct }) {
     }
   };
   console.log("Current Product:", currentProduct);
-  const hasSubscription = currentProduct?.price_id ? true : false;
+  const hasSubscription = currentProduct.status === "active" ? true : false;
 
   const scrollDown = () => {
     window.scrollTo({
@@ -37,8 +36,13 @@ function Subscriptions({ session, currentProduct }) {
       behavior: "smooth",
     });
   };
+
+  const currentSubscription = subscriptions.find(
+    (sub) => sub.productId === currentProduct.product_id
+  );
+
   return (
-    <div className="bg-white">
+    <div className="bg-white min-h-screen">
       <Container size="lg" py="xl">
         {/* Current Subscription Section */}
         <Title order={2} mb="lg" className="text-black">
@@ -46,39 +50,64 @@ function Subscriptions({ session, currentProduct }) {
         </Title>
 
         {hasSubscription ? (
-          <Card shadow="sm" padding="lg" radius="md" withBorder mb="xl">
-            <Group justify="space-between" mb="md">
-              <Group>
-                <Text fw={700} size="xl">
-                  {dummySubscription.planName}
+          <div>
+            <Card shadow="sm" padding="lg" radius="md" withBorder mb="xl">
+              <Group justify="space-between" mb="md">
+                <Group>
+                  <Text fw={700} size="xl">
+                    {currentSubscription?.title}
+                  </Text>
+                  <Badge
+                    color={
+                      currentProduct?.status === "active" ? "green" : "gray"
+                    }
+                    variant="light"
+                  >
+                    {currentProduct?.status}
+                  </Badge>
+                </Group>
+                <Text size="lg" c="gray">
+                  {currentSubscription?.price}/{currentSubscription?.period}
                 </Text>
-                <Badge
-                  color={
-                    dummySubscription.status === "Active" ? "green" : "gray"
-                  }
-                  variant="light"
-                >
-                  {dummySubscription.status}
-                </Badge>
               </Group>
-              <Text size="lg" c="gray">
-                {dummySubscription.price}/{dummySubscription.billingCycle}
-              </Text>
-            </Group>
 
-            <Text c="gray" size="sm" mb="md">
-              Next billing: {dummySubscription.nextBillingDate}
-            </Text>
-
-            <Text c="gray" size="sm" fw={500} mb="xs">
-              Included Features:
-            </Text>
-            {dummySubscription.features.map((feature, index) => (
-              <Text key={index} size="sm" c="dimmed">
-                • {feature}
+              <Text c="gray" size="sm" mb="md">
+                Next billing:{" "}
+                {currentProduct?.current_period_end
+                  ? format(
+                      new Date(currentProduct.current_period_end),
+                      "MMMM dd, yyyy"
+                    )
+                  : "N/A"}
               </Text>
-            ))}
-          </Card>
+
+              <Text c="gray" size="sm" fw={500} mb="xs">
+                Included Features:
+              </Text>
+              {currentSubscription?.features.map((feature, index) => (
+                <Text key={index} size="sm" c="dimmed">
+                  • {feature}
+                </Text>
+              ))}
+              <Button
+                color="blue"
+                variant="light"
+                mt={20}
+                onClick={() => handleManageSubscription()}
+              >
+                Manage Subscription
+              </Button>
+              <Button
+                color="green"
+                variant="light"
+                mt={20}
+                onClick={() => handleManageSubscription()}
+              >
+                Need an upgrade?
+              </Button>
+            </Card>
+            <AdditionalWebsite session={session} />
+          </div>
         ) : (
           <Card shadow="sm" padding="lg" radius="md" withBorder mb="xl">
             <Text size="lg" fw={500} mb="md">
@@ -96,12 +125,6 @@ function Subscriptions({ session, currentProduct }) {
             </Button>
           </Card>
         )}
-
-        {/* Pricing Packages Section */}
-        <Title order={2} mb="lg" className="text-black">
-          Available Plans
-        </Title>
-        <PricingPackages userPage={true} />
       </Container>
     </div>
   );

@@ -90,7 +90,39 @@ export const yearlyPackages = [
     ],
   },
 ];
+export const additionalWebsite = [
+  {
+    title: "Additional Website",
+    description: "Add an extra website to your plan.",
+    price: "£4.99",
+    period: "Per Month",
+    productId: "prod_RwsN7Od2x9oclp",
+    features: [
+      "1 Additional Website",
+      "Same hosting & features as main plan",
+      "No extra pages included",
+      "Uses your existing CDN & SEO settings",
+    ],
+  },
+  {
+    title: "Additional Website (Yearly)",
+    description: "Add an extra website to your plan with yearly billing.",
+    price: "£49.99",
+    period: "Per Year",
+    productId: "prod_RxWdViMjptGwy5",
+    features: [
+      "1 Additional Website",
+      "Same hosting & features as main plan",
+      "No extra pages included",
+      "Uses your existing CDN & SEO settings",
+    ],
+  },
+];
 
-const subscriptions = [...monthlyPackages, ...yearlyPackages];
+const subscriptions = [
+  ...monthlyPackages,
+  ...yearlyPackages,
+  ...additionalWebsite,
+];
 
 export { subscriptions };

@@ -25,7 +25,7 @@ interface PriceDetails {
 async function Page() {
   // Get user session
   const session = await getServerSession(authOptions);
-
+  console.log("User session:", session);
   try {
     // Fetch subscription details
     const checkSubscriptionResponse = await axios.post(

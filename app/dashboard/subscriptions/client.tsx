@@ -28,7 +28,7 @@ function Subscriptions({ session, currentProduct }) {
     }
   };
   console.log("Current Product:", currentProduct);
-  const hasSubscription = currentProduct.status === "active" ? true : false;
+  const hasSubscription = currentProduct?.status === "active" ? true : false;
 
   const scrollDown = () => {
     window.scrollTo({
@@ -38,7 +38,7 @@ function Subscriptions({ session, currentProduct }) {
   };
 
   const currentSubscription = subscriptions.find(
-    (sub) => sub.productId === currentProduct.product_id
+    (sub) => sub.productId === currentProduct?.product_id
   );
 
   return (
@@ -75,7 +75,7 @@ function Subscriptions({ session, currentProduct }) {
                 Next billing:{" "}
                 {currentProduct?.current_period_end
                   ? format(
-                      new Date(currentProduct.current_period_end),
+                      new Date(currentProduct?.current_period_end),
                       "MMMM dd, yyyy"
                     )
                   : "N/A"}

@@ -14,19 +14,18 @@ export async function POST(req: Request) {
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-
+  console.log("User ID:", userId);
   const { data, error } = await supabase
     .from("subscriptions")
     .select("*")
     .eq("user_id", userId)
     .single();
-
+  console.log("Subscription data:", error);
   if (error) {
     return NextResponse.json(
       { error: "Failed to get subscription" },
       { status: 500 }
     );
   }
-
   return NextResponse.json(data);
 }

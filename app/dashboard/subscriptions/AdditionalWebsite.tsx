@@ -17,7 +17,7 @@ function AdditionalWebsite({ session, currentProduct }) {
   const currentPlan = additionalWebsite.find(
     (plan) => plan.period === selectedPeriod
   );
-console.log(session, currentProduct)
+console.log("current", currentProduct)
   const createCheckoutSession = async () => {
     if (!session || !currentPlan) return;
 
@@ -25,9 +25,9 @@ console.log(session, currentProduct)
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        stripeSubscriptionId: session?.stripe_subscription_id,
+        stripeSubscriptionId: currentProduct?.stripe_subscription_id,
         additionalWebsiteProductId: currentPlan.productId,
-        quantity, // Pass quantity to Stripe
+        quantity:quantity, // Pass quantity to Stripe
       }),
     });
 

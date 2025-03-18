@@ -17,17 +17,16 @@ function AdditionalWebsite({ session, currentProduct }) {
   const currentPlan = additionalWebsite.find(
     (plan) => plan.period === selectedPeriod
   );
-
+console.log(session, currentProduct)
   const createCheckoutSession = async () => {
     if (!session || !currentPlan) return;
 
-    const res = await fetch("/api/stripe/checkout", {
+    const res = await fetch("/api/stripe/subscription/addon", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        userId: session?.user?.id,
-        productId: currentPlan.productId,
-        stripeId: session?.stripeCustomerId,
+        stripeSubscriptionId: session?.stripe_subscription_id,
+        additionalWebsiteProductId: currentPlan.productId,
         quantity, // Pass quantity to Stripe
       }),
     });

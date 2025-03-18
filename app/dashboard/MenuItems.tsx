@@ -48,7 +48,7 @@ function MenuItems({ session }) {
           >
             <Link
               href={item.link}
-              className="inline-flex items-center w-full text-sm font-semibold transition-colors duration-150"
+              className="inline-flex items-center w-full text-xs font-semibold transition-colors duration-150"
             >
               {item.icon}
               <span className="ml-4">{item.label}</span>

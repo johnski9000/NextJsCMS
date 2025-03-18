@@ -16,14 +16,14 @@ function Sidebar({ session }) {
     <div>
       <div
         className={`${
-          isExpanded ? "w-[60px] md:w-[250px]" : "w-[60px]"
+          isExpanded ? "w-[60px] md:w-[200px]" : "w-[60px]"
         } transition-all duration-300`}
       />
 
       <Box
         title="CMS Menu"
         className={`fixed top-0 left-0 bottom-0 flex flex-col ${
-          isExpanded ? "w-[250px]" : "w-[60px]"
+          isExpanded ? "w-[200px]" : "w-[60px]"
         } bg-black shadow-md transition-all duration-300`}
         style={{ zIndex: 100 }}
       >
@@ -77,7 +77,7 @@ function Sidebar({ session }) {
               fullWidth
               color="green"
               variant="filled"
-              className={`flex items-center justify-center gap-2 font-medium    ${
+              className={`!text-xs flex items-center justify-center gap-2 font-medium    ${
                 !isExpanded
                   ? "justify-center !p-0 !rounded-tr-none !rounded-bl-none"
                   : ""
@@ -92,7 +92,7 @@ function Sidebar({ session }) {
               fullWidth
               color="red"
               variant="filled"
-              className={`mt-auto flex items-center gap-2 hover:bg-red-700 transition-all duration-200 font-semibold ${
+              className={`!text-xs mt-auto flex items-center gap-2 hover:bg-red-700 transition-all duration-200 font-semibold ${
                 !isExpanded
                   ? "justify-center !p-0 !rounded-tr-none !rounded-bl-none"
                   : ""

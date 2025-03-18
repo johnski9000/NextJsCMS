@@ -60,21 +60,16 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
     return;
   }
 
-  // 2️⃣ Extract subscription details
+  // 2️⃣ Extract main subscription details
   const status = subscription.status;
-  const currentPeriodStart = new Date(
-    subscription.current_period_start * 1000
-  ).toISOString();
-  const currentPeriodEnd = new Date(
-    subscription.current_period_end * 1000
-  ).toISOString();
+  const currentPeriodStart = new Date(subscription.current_period_start * 1000).toISOString();
+  const currentPeriodEnd = new Date(subscription.current_period_end * 1000).toISOString();
 
-  // Assume the first item is the main plan, subsequent items are add-ons
   const mainItem = subscription.items.data[0];
   const priceId = mainItem?.price.id;
   const productId = mainItem?.price.product as string;
 
-  // Filter out the main item to get add-ons
+  // 3️⃣ Extract additional add-ons
   const addons = subscription.items.data
     .slice(1) // Skip the first item (main plan)
     .map((item) => ({
@@ -84,47 +79,55 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
     }));
 
   console.log(
-    `📌 Updating subscription: ${
-      subscription.id
-    }, Status: ${status}, Main Product ID: ${productId}, Add-ons: ${JSON.stringify(
+    `📌 Updating subscription: ${subscription.id}, Status: ${status}, Main Product ID: ${productId}, Add-ons: ${JSON.stringify(
       addons
     )}`
   );
 
-  // 3️⃣ Check if the subscription already exists
+  // 4️⃣ Check if the subscription already exists
   const { data: existingSubscription, error: fetchError } = await supabase
     .from("subscriptions")
-    .select("id")
+    .select("id, addons")
     .eq("stripe_subscription_id", subscription.id)
     .single();
 
   if (fetchError && fetchError.code !== "PGRST116") {
-    // PGRST116 means "no results found" - safe to ignore
     console.error("⚠️ Error fetching subscription:", fetchError);
   }
 
-  // 4️⃣ Update or Insert subscription in Supabase
+  // 5️⃣ Update or Insert subscription in Supabase
   if (existingSubscription) {
-    // ✅ Update existing subscription
-    const { error: updateError } = await supabase
-      .from("subscriptions")
-      .update({
-        status,
-        price_id: priceId,
-        product_id: productId,
-        addons, // Store add-ons as JSONB
-        current_period_start: currentPeriodStart,
-        current_period_end: currentPeriodEnd,
-      })
-      .eq("stripe_subscription_id", subscription.id);
+    const existingAddons = existingSubscription.addons || [];
 
-    if (updateError) {
-      console.error(
-        "❌ Failed to update subscription in Supabase:",
-        updateError
-      );
+    // Only update if something changed
+    const isSameData =
+      JSON.stringify(existingAddons) === JSON.stringify(addons) &&
+      existingSubscription.status === status &&
+      existingSubscription.price_id === priceId &&
+      existingSubscription.product_id === productId &&
+      existingSubscription.current_period_start === currentPeriodStart &&
+      existingSubscription.current_period_end === currentPeriodEnd;
+
+    if (!isSameData) {
+      const { error: updateError } = await supabase
+        .from("subscriptions")
+        .update({
+          status,
+          price_id: priceId,
+          product_id: productId,
+          addons, // Store add-ons as JSONB
+          current_period_start: currentPeriodStart,
+          current_period_end: currentPeriodEnd,
+        })
+        .eq("stripe_subscription_id", subscription.id);
+
+      if (updateError) {
+        console.error("❌ Failed to update subscription in Supabase:", updateError);
+      } else {
+        console.log("✅ Subscription successfully updated in Supabase");
+      }
     } else {
-      console.log("✅ Subscription successfully updated in Supabase");
+      console.log("✅ No changes detected, skipping update.");
     }
   } else {
     // ✅ Insert new subscription
@@ -143,15 +146,13 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
     ]);
 
     if (insertError) {
-      console.error(
-        "❌ Failed to insert new subscription in Supabase:",
-        insertError
-      );
+      console.error("❌ Failed to insert new subscription in Supabase:", insertError);
     } else {
       console.log("✅ New subscription successfully added to Supabase");
     }
   }
 }
+
 
 /**
  * Handles subscription cancellation.

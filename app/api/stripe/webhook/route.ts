@@ -80,6 +80,9 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
     .from("subscriptions")
     .select("id")
     .eq("stripe_subscription_id", subscription.id)
+    .eq("user_id", user.id)
+    .eq("price_id", priceId)
+    .eq("product_id", productId)
     .single();
 
   if (fetchError && fetchError.code !== "PGRST116") {

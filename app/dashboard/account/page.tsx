@@ -23,9 +23,9 @@ function SettingsPage() {
   return (
     <div className="bg-white">
       <Container size="lg" py="xl">
-        <Title order={1} mb="xl" className="text-black text-center">
+        {/* <Title order={1} mb="xl" className="text-black text-center">
           Settings
-        </Title>
+        </Title> */}
 
         {/* Profile Settings */}
         <Card shadow="sm" padding="lg" radius="md" withBorder mb="xl">

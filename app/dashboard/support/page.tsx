@@ -51,12 +51,8 @@ function SupportPage() {
   return (
     <div className="bg-white min-h-screen text-black">
       <Container size="lg" py="xl">
-        <Title order={1} ta="center" mb="xl">
-          Support Center
-        </Title>
 
         <Box
-          grow
           align="flex-start"
           spacing="xl"
           className="flex flex-col items-start md:flex-row md:justify-between gap-4"
@@ -79,7 +75,6 @@ function SupportPage() {
             <form onSubmit={form.onSubmit(handleSubmit)}>
               <Stack spacing="md">
                 <Group
-                  grow
                   direction={{ base: "column", sm: "row" }} // Stack inputs vertically on mobile
                 >
                   <TextInput

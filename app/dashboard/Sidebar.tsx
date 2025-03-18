@@ -7,6 +7,7 @@ import { FaPlus, FaSignOutAlt, FaBars, FaTimes } from "react-icons/fa";
 import { signOut } from "next-auth/react";
 import Image from "next/image";
 import MenuItems from "./MenuItems";
+import { FaAnglesLeft } from "react-icons/fa6";
 
 function Sidebar({ session }) {
   const [isExpanded, setIsExpanded] = useState(true);
@@ -32,26 +33,26 @@ function Sidebar({ session }) {
         >
           {/* Sidebar Toggle Button */}
           <div
-            className="p-3 flex justify-between items-center absolute top-0  right-0 z-40"
+            className="p-3 flex justify-between items-center absolute top-0  right-[-25px] z-40"
             onClick={() => setIsExpanded(!isExpanded)}
           >
             <ActionIcon
               color="orange"
-              variant="light"
+              variant="filled"
               className={
                 "transition-all duration-300" +
                 (isExpanded ? "" : " mx-auto rounded-full")
               }
             >
-              {isExpanded ? <FaTimes size={18} /> : <FaBars size={18} />}
+              {isExpanded ? <FaAnglesLeft size={18} /> : <FaAnglesLeft size={18} className="rotate-180" />}
             </ActionIcon>
           </div>
 
           {/* Scrollable Menu */}
           <ScrollArea className="flex-grow">
-            <div className="flex-1 px-3 py-4 mt-[30px]">
+            <div className="flex-1 px-3 py-4">
               {!isExpanded ? (
-                <h4 className="text-lg font-semibold text-gray-700 dark:text-white">
+                <h4 className="text-lg font-semibold text-gray-700 dark:text-white mt-[15px]">
                   <Image
                     src="/mobileLogo.png"
                     alt="Logo"
@@ -60,7 +61,7 @@ function Sidebar({ session }) {
                   />
                 </h4>
               ) : (
-                <Image src="/newLogo.png" alt="Logo" width={150} height={150} />
+                <Image src="/newLogo.png" alt="Logo" width={150} height={150}  />
               )}
             </div>
             <MenuItems session={session} isExpanded={isExpanded} />
@@ -74,7 +75,7 @@ function Sidebar({ session }) {
           >
             <Button
               fullWidth
-              color="orange"
+              color="green"
               variant="filled"
               className={`flex items-center justify-center gap-2 font-medium    ${
                 !isExpanded
@@ -84,7 +85,7 @@ function Sidebar({ session }) {
               leftSection={isExpanded && <FaPlus />}
               onClick={() => console.log("Add new page")}
             >
-              {isExpanded && "Add New Page"}
+              {isExpanded && "Add New Website"}
               {!isExpanded && <FaPlus />}
             </Button>
             <Button

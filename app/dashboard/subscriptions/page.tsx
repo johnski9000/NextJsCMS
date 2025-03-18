@@ -10,6 +10,8 @@ import {
 } from "@mantine/core";
 import PricingPackages from "@/app/PricingPackages";
 import React from "react";
+import { useSubscription } from "@/app/context/SubscriptionContext";
+import { useSession } from "next-auth/react";
 
 // Dummy subscription data (null represents no subscription)
 const dummySubscription = null; // Change to the previous object for active subscription example
@@ -23,8 +25,24 @@ const dummySubscription = null; // Change to the previous object for active subs
 }; */
 
 function Subscriptions() {
-  const hasSubscription = !!dummySubscription;
+  const {data: session} = useSession();
+  const stripeId = session?.stripeCustomerId;
 
+  const handleManageSubscription = async () => {
+    const res = await fetch("/api/stripe/portal", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ stripeCustomerId: stripeId }),
+    });
+
+    const data = await res.json();
+    if (data.url) {
+      window.location.href = data.url;
+    }
+  };
+  const hasSubscription = !!dummySubscription;
+  const { data: subscription, isValidating } = useSubscription();
+  console.log(subscription);
   const scrollDown = () => {
     window.scrollTo({
       top: 250,
@@ -81,7 +99,7 @@ function Subscriptions() {
             <Text c="gray" size="sm" mb="md">
               You currently don&apos;t have an active subscription plan.
             </Text>
-            <Button color="blue" variant="light" onClick={scrollDown}>
+            <Button color="blue" variant="light" onClick={() => handleManageSubscription()}>
               Choose a Plan Below
             </Button>
           </Card>

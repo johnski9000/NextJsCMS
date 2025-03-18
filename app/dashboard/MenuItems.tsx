@@ -7,20 +7,7 @@ import { FaGlobe, FaCreditCard, FaCog, FaHeadset } from "react-icons/fa";
 
 function MenuItems({ session }) {
   const pathname = usePathname(); // Get current route
-  const stripeId = session?.stripeCustomerId;
 
-  const handleManageSubscription = async () => {
-    const res = await fetch("/api/stripe/portal", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ stripeCustomerId: stripeId }),
-    });
-
-    const data = await res.json();
-    if (data.url) {
-      window.location.href = data.url;
-    }
-  };
 
   const dashboardItems = [
     {
@@ -35,8 +22,8 @@ function MenuItems({ session }) {
     },
     {
       icon: <FaCog className="w-5 h-5" />,
-      label: "Settings",
-      link: "/dashboard/settings",
+      label: "Account",
+      link: "/dashboard/account",
     },
     {
       icon: <FaHeadset className="w-5 h-5" />,

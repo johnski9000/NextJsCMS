@@ -41,7 +41,7 @@ export async function POST(req: Request) {
 
 /**
  * Handles subscription creation and updates.
- * Syncs Stripe subscription data (including multiple items) with Supabase.
+ * Syncs Stripe subscription data with Supabase, separating main plan and add-ons.
  */
 async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
   const customerId = subscription.customer as string;
@@ -69,17 +69,26 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
     subscription.current_period_end * 1000
   ).toISOString();
 
-  // Extract all items (main plan + add-ons)
-  const items = subscription.items.data.map((item) => ({
-    price_id: item.price.id,
-    product_id: item.price.product as string,
-    quantity: item.quantity || 1,
-  }));
+  // Assume the first item is the main plan, subsequent items are add-ons
+  const mainItem = subscription.items.data[0];
+  const priceId = mainItem?.price.id;
+  const productId = mainItem?.price.product as string;
+
+  // Filter out the main item to get add-ons
+  const addons = subscription.items.data
+    .slice(1) // Skip the first item (main plan)
+    .map((item) => ({
+      price_id: item.price.id,
+      product_id: item.price.product as string,
+      quantity: item.quantity || 1,
+    }));
 
   console.log(
     `📌 Updating subscription: ${
       subscription.id
-    }, Status: ${status}, Items: ${JSON.stringify(items)}`
+    }, Status: ${status}, Main Product ID: ${productId}, Add-ons: ${JSON.stringify(
+      addons
+    )}`
   );
 
   // 3️⃣ Check if the subscription already exists
@@ -101,10 +110,11 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
       .from("subscriptions")
       .update({
         status,
-        items, // Store all items as JSON
+        price_id: priceId,
+        product_id: productId,
+        addons, // Store add-ons as JSONB
         current_period_start: currentPeriodStart,
         current_period_end: currentPeriodEnd,
-        updated_at: new Date().toISOString(),
       })
       .eq("stripe_subscription_id", subscription.id);
 
@@ -123,7 +133,9 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
         user_id: user.id,
         stripe_subscription_id: subscription.id,
         status,
-        items, // Store all items as JSON
+        price_id: priceId,
+        product_id: productId,
+        addons, // Store add-ons as JSONB
         current_period_start: currentPeriodStart,
         current_period_end: currentPeriodEnd,
         created_at: new Date().toISOString(),

@@ -2,100 +2,13 @@
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import React, { useState } from "react";
+import { monthlyPackages, yearlyPackages } from "./utils/subscriptions";
 
 function PricingPackages({ userPage = false }) {
   const [isMonthly, setIsMonthly] = useState(true);
   const { data: session, status } = useSession();
-  console.log("Session", session);
   const togglePricing = () => setIsMonthly(!isMonthly);
 
-  const monthlyPackages = [
-    {
-      title: "Starter Plan",
-      description: "Perfect for getting started",
-      price: "£9.99",
-      period: "Per Month",
-      stripeID: "prod_Rws4heO15q7ZRn",
-      features: [
-        "1 Website",
-        "1 Page",
-        "Basic SEO",
-        "Email Support",
-        "Fast CDN Hosting",
-      ],
-    },
-    {
-      title: "Business Plan",
-      description: "Ideal for small to medium businesses",
-      price: "£19.99",
-      period: "Per Month",
-      features: [
-        "3 Websites",
-        "5 Pages per site",
-        "Advanced SEO",
-        "Priority Email Support",
-        "Performance Optimizations",
-      ],
-    },
-    {
-      title: "Pro Plan",
-      description: "Unlimited potential for growing businesses",
-      price: "£29.99",
-      period: "Per Month",
-      features: [
-        "Unlimited Websites",
-        "Unlimited Pages",
-        "Premium SEO",
-        "Priority Support",
-        "Enhanced Performance Optimizations",
-      ],
-    },
-  ];
-
-  const yearlyPackages = [
-    {
-      title: "Starter Plan",
-      description: "Perfect for individuals starting their online presence",
-      price: "£99",
-      period: "Per Year",
-      features: [
-        "1 Website",
-        "1 Page",
-        "Basic SEO Optimization",
-        "Basic CDN Hosting",
-        "Email Support",
-      ],
-    },
-    {
-      title: "Business Plan",
-      description: "Best for growing businesses with multiple websites",
-      price: "£199",
-      period: "Per Year",
-      features: [
-        "Up to 5 Websites",
-        "Up to 5 Pages per Website",
-        "Advanced SEO Tools",
-        "Enhanced CDN Hosting",
-        "Priority Support",
-        "Website Analytics",
-      ],
-    },
-    {
-      title: "Pro Plan",
-      description: "Ideal for businesses needing unlimited flexibility",
-      price: "£299",
-      period: "Per Year",
-      features: [
-        "Unlimited Websites",
-        "Unlimited Pages",
-        "Comprehensive SEO Suite",
-        "Global CDN Hosting",
-        "Dedicated Support",
-        "Advanced Website Analytics",
-        "Custom Domain Support",
-      ],
-    },
-  ];
   const handleClick = (plan: { stripeID: string }) => {
     if (session) {
       return `/dashboard/checkout?plan=${plan.stripeID}`;

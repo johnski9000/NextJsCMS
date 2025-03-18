@@ -48,7 +48,7 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
 
   console.log(`🔄 Handling subscription update for customer: ${customerId}`);
 
-  // Get the associated user from Supabase
+  // 1️⃣ Fetch the associated user from Supabase
   const { data: user, error: userError } = await supabase
     .from("users")
     .select("id")
@@ -60,28 +60,34 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
     return;
   }
 
-  // Ensure correct plan selection
+  // 2️⃣ Extract subscription details
   const priceId = subscription.items.data[0]?.price.id;
+  const productId = subscription.items.data[0]?.price.product as string;
   const status = subscription.status;
+  const currentPeriodStart = new Date(
+    subscription.current_period_start * 1000
+  ).toISOString();
   const currentPeriodEnd = new Date(
     subscription.current_period_end * 1000
   ).toISOString();
 
   console.log(
-    `📌 Updating subscription: ${subscription.id}, Status: ${status}`
+    `📌 Updating subscription: ${subscription.id}, Status: ${status}, Product ID: ${productId}`
   );
 
-  // Check if subscription already exists
+  // 3️⃣ Check if the subscription already exists
   const { data: existingSubscription, error: fetchError } = await supabase
     .from("subscriptions")
     .select("id")
     .eq("stripe_subscription_id", subscription.id)
     .single();
 
-  if (fetchError) {
+  if (fetchError && fetchError.code !== "PGRST116") {
+    // PGRST116 means "no results found" - safe to ignore
     console.error("⚠️ Error fetching subscription:", fetchError);
   }
 
+  // 4️⃣ Update or Insert subscription in Supabase
   if (existingSubscription) {
     // ✅ Update existing subscription
     const { error: updateError } = await supabase
@@ -89,7 +95,9 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
       .update({
         status,
         price_id: priceId,
-        current_period_end: currentPeriodEnd,
+        product_id: productId, // New field ✅
+        current_period_start,
+        current_period_end,
       })
       .eq("stripe_subscription_id", subscription.id);
 
@@ -109,8 +117,10 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
         stripe_subscription_id: subscription.id,
         status,
         price_id: priceId,
-        current_period_start: new Date().toISOString(),
-        current_period_end: currentPeriodEnd,
+        product_id: productId, // New field ✅
+        current_period_start,
+        current_period_end,
+        created_at: new Date().toISOString(),
       },
     ]);
 

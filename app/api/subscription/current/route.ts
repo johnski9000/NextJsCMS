@@ -9,21 +9,23 @@ const supabase = createClient(
 );
 
 // ✅ API Route: GET `/api/subscription`
-export async function GET(req: Request) {
-  const session = await getServerSession(authOptions);
-
-  if (!session?.user) {
+export async function POST(req: Request) {
+  const { userId } = await req.json();
+  if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const { data, error } = await supabase
     .from("subscriptions")
     .select("*")
-    .eq("user_id", session.user.id)
+    .eq("user_id", userId)
     .single();
 
   if (error) {
-    return NextResponse.json({ error: "Failed to get subscription" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to get subscription" },
+      { status: 500 }
+    );
   }
 
   return NextResponse.json(data);

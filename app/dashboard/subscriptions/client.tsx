@@ -13,6 +13,7 @@ import { subscriptions } from "@/app/utils/subscriptions";
 import { format } from "date-fns";
 import AdditionalWebsite from "./AdditionalWebsite";
 import PricingPackages from "@/app/PricingPackages";
+import Link from "next/link";
 function Subscriptions({ session, currentProduct }) {
   const stripeId = session?.stripeCustomerId || "";
 
@@ -97,14 +98,11 @@ function Subscriptions({ session, currentProduct }) {
               >
                 Manage Subscription
               </Button>
-              <Button
-                color="green"
-                variant="light"
-                mt={20}
-                onClick={() => handleManageSubscription()}
-              >
-                Need an upgrade?
-              </Button>
+              <Link href="/dashboard/subscriptions/update" className="w-full">
+                <Button fullWidth color="green" variant="light" mt={20}>
+                  Change Plan
+                </Button>
+              </Link>
             </Card>
             <AdditionalWebsite
               session={session}

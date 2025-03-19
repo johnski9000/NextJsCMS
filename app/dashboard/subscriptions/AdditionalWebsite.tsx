@@ -1,33 +1,24 @@
 import { useState } from "react";
-import {
-  Button,
-  Card,
-  Text,
-  SegmentedControl,
-  Group,
-  NumberInput,
-} from "@mantine/core";
+import { Button, Card, Text, NumberInput, Loader } from "@mantine/core";
 import { additionalWebsite } from "@/app/utils/subscriptions";
+import { showToast } from "@/app/utils/toast";
+import { useRouter } from "next/navigation";
 
 function AdditionalWebsite({ session, currentProduct }) {
-  const [selectedPeriod, setSelectedPeriod] = useState("Per Month");
   const [quantity, setQuantity] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
-  // Find the selected plan based on the selectedPeriod
-  const currentPlan = additionalWebsite.find(
-    (plan) => plan.period === selectedPeriod
-  );
-console.log("current", currentProduct)
   const createCheckoutSession = async () => {
-    if (!session || !currentPlan) return;
-
+    if (!session || !additionalWebsite) return;
+    setLoading(true);
     const res = await fetch("/api/stripe/subscription/addon", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         stripeSubscriptionId: currentProduct?.stripe_subscription_id,
-        additionalWebsiteProductId: currentPlan.productId,
-        quantity:quantity, // Pass quantity to Stripe
+        additionalWebsiteProductId: additionalWebsite.productId,
+        quantity: quantity, // Pass quantity to Stripe
       }),
     });
 
@@ -35,14 +26,28 @@ console.log("current", currentProduct)
 
     if (data.error) {
       console.error("Checkout Error:", data.error);
+      setLoading(false);
       return;
     }
 
-    if (data.url) {
-      window.location.href = data.url; // Redirect to Stripe
-    }
+    setLoading(false);
+    showToast.success("Website added successfully!");
+    router.refresh();
+    return;
   };
 
+  const currentWebsiteAddon = currentProduct?.addons.find(
+    (item) => item.product_id === additionalWebsite.productId
+  )
+    ? {
+        ...currentProduct.addons.find(
+          (item) => item.product_id === additionalWebsite.productId
+        ),
+        ...additionalWebsite,
+      }
+    : null;
+
+  console.log("currentlAmountOfWebsites", currentWebsiteAddon);
   return (
     <Card shadow="sm" padding="lg" radius="md" withBorder mb="xl">
       <Text size="lg" fw={500} mb="md">
@@ -52,17 +57,11 @@ console.log("current", currentProduct)
         You can add more websites to your subscription plan.
       </Text>
 
-      {/* Toggle Between Monthly & Yearly */}
-      <Group position="center" mt="md">
-        <SegmentedControl
-          value={selectedPeriod}
-          onChange={setSelectedPeriod}
-          data={[
-            { label: "Monthly", value: "Per Month" },
-            { label: "Yearly", value: "Per Year" },
-          ]}
-        />
-      </Group>
+      {/* current amount of website  */}
+
+      <Text size="md" fw={500} mb="md">
+        Current amount of additional websites: {currentWebsiteAddon?.quantity}
+      </Text>
 
       {/* Quantity Selector */}
       <NumberInput
@@ -76,22 +75,26 @@ console.log("current", currentProduct)
       />
 
       {/* Display Pricing Info */}
-      {currentPlan && (
+      {additionalWebsite && (
         <>
           <Text size="xl" fw={700} c="orange" align="center" mt="md">
-            {currentPlan.price} / {currentPlan.period} per website
+            {additionalWebsite.price} / {additionalWebsite.period} per website
           </Text>
 
           {/* Checkout Button */}
-          <Button
-            color="orange"
-            variant="light"
-            fullWidth
-            mt="md"
-            onClick={createCheckoutSession}
-          >
-            Add {quantity} {quantity > 1 ? "Websites" : "Website"}
-          </Button>
+          {loading ? (
+            <Loader className="mx-auto my-4" />
+          ) : (
+            <Button
+              color="orange"
+              variant="light"
+              fullWidth
+              mt="md"
+              onClick={createCheckoutSession}
+            >
+              Add {quantity} {quantity > 1 ? "Websites" : "Website"}
+            </Button>
+          )}
         </>
       )}
     </Card>

@@ -8,7 +8,6 @@ import { FaGlobe, FaCreditCard, FaCog, FaHeadset } from "react-icons/fa";
 function MenuItems({ session }) {
   const pathname = usePathname(); // Get current route
 
-
   const dashboardItems = [
     {
       icon: <FaGlobe className="w-5 h-5" />,
@@ -18,16 +17,19 @@ function MenuItems({ session }) {
     {
       icon: <FaCreditCard className="w-5 h-5" />,
       label: "Subscriptions",
+      slug: "subscriptions",
       link: "/dashboard/subscriptions",
     },
     {
       icon: <FaCog className="w-5 h-5" />,
       label: "Account",
+      slug: "account",
       link: "/dashboard/account",
     },
     {
       icon: <FaHeadset className="w-5 h-5" />,
       label: "Support",
+      slug: "support",
       link: "/dashboard/support",
     },
   ];
@@ -35,8 +37,9 @@ function MenuItems({ session }) {
   return (
     <ul className="space-y-2 font-medium p-4">
       {dashboardItems.map((item, index) => {
-        const isActive = pathname === item.link; // Check if the current page matches the menu item
-
+        const isActive =
+          pathname === item.link || // Exact match
+          (item.slug && pathname.startsWith(`${item.link}/`)); // Subpage match
         return (
           <li
             key={index}

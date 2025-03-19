@@ -42,7 +42,7 @@ export default function Home() {
         <div className="max-w-[1440px] mx-auto flex flex-wrap items-center justify-between p-4">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-3">
-            <Image src="/newLogo.png" alt="Logo" width={120} height={40} />
+            <Image src="/desktopLogo.png" alt="Logo" width={120} height={40} />
           </Link>
 
           {/* CTA Button + Mobile Toggle */}

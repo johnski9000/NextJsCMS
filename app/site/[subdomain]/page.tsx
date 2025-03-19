@@ -8,9 +8,12 @@ import DynamicFooter from "@/app/components/DynamicFooter";
 
 // Fetch page data on request
 async function getPageData() {
-  const response = await fetch(`${process.env.NEXTAUTH_URL}/api/pages/home`, {
-    cache: "no-store",
-  });
+  const response = await fetch(
+    `${process.env.NEXTAUTH_URL}/api/pages/{domainname}/{pagename}`,
+    {
+      cache: "no-store",
+    }
+  );
 
   if (!response.ok) return null;
   return response.json();
@@ -24,7 +27,9 @@ interface PageData {
 
 // Fetch all pages
 async function getAllPageData(): Promise<{ key: string; value: any }[] | null> {
-  const response = await fetch(`${process.env.NEXTAUTH_URL}/api/pages/all`);
+  const response = await fetch(
+    `${process.env.NEXTAUTH_URL}/api/{domainname}/all`
+  );
   if (!response.ok) return null;
 
   const data: PageData[] = await response.json(); // Explicitly define type

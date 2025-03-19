@@ -44,7 +44,11 @@ function Sidebar({ session }) {
                 (isExpanded ? "" : " mx-auto rounded-full")
               }
             >
-              {isExpanded ? <FaAnglesLeft size={18} /> : <FaAnglesLeft size={18} className="rotate-180" />}
+              {isExpanded ? (
+                <FaAnglesLeft size={18} />
+              ) : (
+                <FaAnglesLeft size={18} className="rotate-180" />
+              )}
             </ActionIcon>
           </div>
 
@@ -61,7 +65,12 @@ function Sidebar({ session }) {
                   />
                 </h4>
               ) : (
-                <Image src="/newLogo.png" alt="Logo" width={150} height={150}  />
+                <Image
+                  src="/desktopLogo.png"
+                  alt="Logo"
+                  width={150}
+                  height={150}
+                />
               )}
             </div>
             <MenuItems session={session} isExpanded={isExpanded} />

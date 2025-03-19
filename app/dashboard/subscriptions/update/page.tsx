@@ -1,8 +1,9 @@
 import React from "react";
-import Subscriptions from "./client";
+
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/auth";
 import axios from "axios";
+import AvailableSubscriptions from "./client";
 
 // Initialize Stripe with type safety
 
@@ -36,15 +37,17 @@ async function Page() {
 
     // Render component
     return (
-      <div>
-        <Subscriptions session={session} currentProduct={checkSubscription} />
+      <div className="bg-white min-h-screen">
+        <AvailableSubscriptions
+          session={session}
+          currentProduct={checkSubscription}
+        />
       </div>
     );
   } catch (error) {
     console.error("❌ Error in page component:", error);
     return (
       <div className="bg-white min-h-screen">
-        <Subscriptions session={session} currentProduct={null} />
         <p>Error loading subscription details</p>
       </div>
     );

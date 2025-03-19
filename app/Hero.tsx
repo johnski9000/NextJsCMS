@@ -9,30 +9,28 @@ function Hero() {
           <div className="w-full flex-col justify-start items-start gap-14 pt-14 inline-flex">
             <div className="w-full flex-col justify-start items-center lg:gap-28 gap-16 flex">
               <div className="w-full flex-col justify-start items-center gap-8 flex">
-                <div className="w-full flex-col justify-start items-center gap-2.5 flex">
-                  <div className="w-fit px-4 py-2 bg-black/opacity-10 rounded-full border border-orange-500 justify-center items-center gap-2 inline-flex">
-                    <span className="text-center text-white text-xs font-normal leading-tight">
-                      All in one Saas Dashboard, Get 50% Off Now
-                    </span>
-                  </div>
-                  <h2 className="text-center text-white md:text-6xl text-5xl font-bold font-manrope md:leading-normal leading-relaxed">
-                    Efficiency Management
-                  </h2>
-                  <p className="lg:max-w-lg w-full text-center text-white text-base font-normal leading-relaxed">
-                    Optimize Operations, Elevate Performance. Unlock Your
-                    Team&apos;s Full Potential with Seamless Workflow Solutions.
-                  </p>
+                <div className="inline-block px-4 py-2 bg-black bg-opacity-50 rounded-full mb-4">
+                  <span className="text-orange-300 font-medium">
+                    Ignite Your Online Presence
+                  </span>
                 </div>
-                <div className="w-full justify-center items-start gap-3 flex sm:flex-row flex-col">
-                  <button className="sm:w-fit w-full px-5 py-2.5 bg-orange-500 hover:bg-orange-600 transition-all duration-700 ease-in-out rounded-full shadow-[0px_1px_2px_0px_rgba(16,_24,_40,_0.05)] justify-center items-center flex">
-                    <span className="px-2 py-px text-white text-base font-semibold leading-relaxed">
-                      Try Free Version
-                    </span>
+
+                <h1 className="text-5xl md:text-6xl font-bold text-white font-manrope leading-tight">
+                  Easily Manage Your Websites
+                </h1>
+
+                <p className="max-w-2xl mx-auto text-gray-100 text-lg">
+                  Simplify your website management with our intuitive dashboard.
+                  Host, customize, and optimize your websites—all in one place.
+                </p>
+
+                <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+                  <button className="px-6 py-2.5 bg-orange-500 hover:bg-orange-600 transition-all duration-300 rounded-full shadow-md text-black font-semibold">
+                    Get Started
                   </button>
-                  <button className="sm:w-fit w-full group px-5 py-2.5 rounded-full shadow-[0px_1px_2px_0px_rgba(16,_24,_40,_0.05)] border border-white hover:border-gray-300 transition-all duration-700 ease-in-out justify-center items-center flex">
-                    <span className="px-2 text-white hover:text-gray-300 transition-all duration-700 ease-in-out text-base font-semibold leading-relaxed">
-                      Book Your Demo
-                    </span>
+
+                  <button className="px-6 py-2.5 border border-white hover:border-gray-300 transition-all duration-300 rounded-full text-white font-semibold">
+                    View Plans
                   </button>
                 </div>
               </div>

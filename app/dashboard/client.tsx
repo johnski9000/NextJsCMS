@@ -84,9 +84,9 @@ export default function MyWebsitesDashboard({
               Add Your New Website
             </Title>
             <Text size="md" color="dimmed" className="mb-4">
-              Choose a name for your new website. We'll create a subdomain (e.g.{" "}
-              <strong>yourname.ignitecms.com</strong>). You can also optionally
-              provide your own custom domain later.
+              Choose a name for your new website. We&apos;ll create a subdomain
+              (e.g. <strong>yourname.ignitecms.com</strong>). You can also
+              optionally provide your own custom domain later.
             </Text>
             <form onSubmit={submitForm}>
               <div className="text-left mb-4">

@@ -183,7 +183,7 @@ function PricingPackages({ userPage = false, session, currentProduct }) {
   };
 
   return (
-    <section className="bg-white bg-no-repeat bg-cover w-full bg-center">
+    <section className="bg-white bg-no-repeat bg-cover w-full bg-center p-8">
       <style
         dangerouslySetInnerHTML={{
           __html: `

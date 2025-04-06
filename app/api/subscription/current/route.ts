@@ -1,6 +1,4 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/auth";
 import { createClient } from "@supabase/supabase-js";
 
 const supabase = createClient(
@@ -11,6 +9,7 @@ const supabase = createClient(
 // ✅ API Route: GET `/api/subscription`
 export async function POST(req: Request) {
   const { userId } = await req.json();
+  console.log("User ID:", userId);
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }

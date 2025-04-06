@@ -1,9 +1,7 @@
 "use client";
-
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { createClient } from "@supabase/supabase-js";
 import {
   Button,
   TextInput,
@@ -18,11 +16,6 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
-
 export default function SignupPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -31,43 +24,6 @@ export default function SignupPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const selectedPlan = searchParams.get("plan");
-
-  const handleSignup = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-
-    // Sign up with Supabase
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-    });
-
-    if (error) {
-      setError(error.message);
-      setLoading(false);
-      return;
-    }
-
-    // Automatically log in user with NextAuth
-    const user = await signIn("credentials", {
-      email,
-      password,
-      redirect: false,
-    });
-    if (user?.error) {
-      setError(user.error);
-      setLoading(false);
-      return;
-    }
-
-    // Redirect user based on plan selection
-    if (selectedPlan) {
-      router.push(`/dashboard/checkout?plan=${selectedPlan}`);
-    } else {
-      router.push("/dashboard");
-    }
-  };
 
   return (
     <Box className="bg-black h-screen w-screen flex flex-col items-center justify-center">
@@ -89,7 +45,7 @@ export default function SignupPage() {
         radius="md"
         className="!bg-gray-900 border-orange-500"
       >
-        <form onSubmit={handleSignup}>
+        <form onSubmit={() => {}}>
           <TextInput
             label="Email Address"
             placeholder="Enter your email"

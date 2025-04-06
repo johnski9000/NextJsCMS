@@ -4,7 +4,7 @@ import { createClient } from "@supabase/supabase-js";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
@@ -62,8 +62,12 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
 
   // 2️⃣ Extract main subscription details
   const status = subscription.status;
-  const currentPeriodStart = new Date(subscription.current_period_start * 1000).toISOString();
-  const currentPeriodEnd = new Date(subscription.current_period_end * 1000).toISOString();
+  const currentPeriodStart = new Date(
+    subscription.current_period_start * 1000
+  ).toISOString();
+  const currentPeriodEnd = new Date(
+    subscription.current_period_end * 1000
+  ).toISOString();
 
   const mainItem = subscription.items.data[0];
   const priceId = mainItem?.price.id;
@@ -79,7 +83,9 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
     }));
 
   console.log(
-    `📌 Updating subscription: ${subscription.id}, Status: ${status}, Main Product ID: ${productId}, Add-ons: ${JSON.stringify(
+    `📌 Updating subscription: ${
+      subscription.id
+    }, Status: ${status}, Main Product ID: ${productId}, Add-ons: ${JSON.stringify(
       addons
     )}`
   );
@@ -122,7 +128,10 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
         .eq("stripe_subscription_id", subscription.id);
 
       if (updateError) {
-        console.error("❌ Failed to update subscription in Supabase:", updateError);
+        console.error(
+          "❌ Failed to update subscription in Supabase:",
+          updateError
+        );
       } else {
         console.log("✅ Subscription successfully updated in Supabase");
       }
@@ -146,13 +155,15 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
     ]);
 
     if (insertError) {
-      console.error("❌ Failed to insert new subscription in Supabase:", insertError);
+      console.error(
+        "❌ Failed to insert new subscription in Supabase:",
+        insertError
+      );
     } else {
       console.log("✅ New subscription successfully added to Supabase");
     }
   }
 }
-
 
 /**
  * Handles subscription cancellation.

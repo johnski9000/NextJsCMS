@@ -17,7 +17,9 @@
 body {
   color: var(--foreground);
   background: "black" !important;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Montserrat", sans-serif;
+  letter-spacing: 0.1em;
+  font-size: 14px;
 }
 .mantine-Modal-root {
   transform: none !important;

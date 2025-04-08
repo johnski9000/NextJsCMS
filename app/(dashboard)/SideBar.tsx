@@ -128,16 +128,12 @@ const SideBar: React.FC<SideBarProps> = ({ children }) => {
 
   return (
     <>
-      <nav className="fixed top-0 z-50 w-full bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+      <nav className="fixed top-0 z-50 w-full border-b  bg-gray-800 border-gray-700">
         <div className="px-3 py-3 lg:px-5 lg:pl-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center justify-start rtl:justify-end">
               <Link href="/" className="flex ms-2 md:me-24">
-                <img
-                  src="/api/placeholder/150/50"
-                  className="h-8 me-3"
-                  alt="Logo"
-                />
+                <img src="/desktopLogo.png" className="h-12 me-3" alt="Logo" />
               </Link>
             </div>
             <div className="flex items-center">
@@ -209,18 +205,18 @@ const SideBar: React.FC<SideBarProps> = ({ children }) => {
 
       <aside
         id="logo-sidebar"
-        className={`fixed top-0 left-0 z-40 w-64 h-screen pt-20 transition-transform ${
+        className={`fixed top-0 left-0 z-40 w-52 h-screen pt-20 transition-transform ${
           isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
-        } bg-white border-r border-gray-200 sm:translate-x-0 dark:bg-gray-800 dark:border-gray-700`}
+        }  border-r  sm:translate-x-0 bg-gray-800 border-gray-700`}
         aria-label="Sidebar"
       >
-        <div className="h-full px-3 pb-4 overflow-y-auto bg-white dark:bg-gray-800">
+        <div className="h-full px-3 pb-4 overflow-y-auto bg-gray-800">
           <ul className="space-y-2 font-medium">
             {menuItems.map((item, index) => (
               <li key={`sidebar-item-${index}`}>
                 <Link
                   href={item.href}
-                  className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+                  className="flex items-center p-2 rounded-lg text-white  hover:bg-gray-700 group"
                 >
                   <span className="text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white">
                     {item.icon}
@@ -236,7 +232,7 @@ const SideBar: React.FC<SideBarProps> = ({ children }) => {
         </div>
       </aside>
 
-      <div className="lg:pl-64 pt-20 px-4 sm:px-6 lg:px-8 bg-gray-50 dark:bg-gray-900 min-h-screen">
+      <div className="lg:pl-56 pt-20 px-4 sm:px-6 lg:px-8 bg-gray-900 min-h-screen">
         {children}
       </div>
     </>

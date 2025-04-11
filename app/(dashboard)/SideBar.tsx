@@ -11,7 +11,15 @@ import {
   FiUserPlus,
   FiMenu,
   FiFileText,
+  FiGlobe,
+  FiLayout,
+  FiSearch,
+  FiLink,
+  FiBarChart2,
+  FiImage,
+  FiSettings,
 } from "react-icons/fi";
+import UserAvatar from "./UserAvatar";
 
 interface SideBarProps {
   children: React.ReactNode;
@@ -53,52 +61,56 @@ const SideBar: React.FC<SideBarProps> = ({ children }) => {
       icon: <FiHome className="w-5 h-5" />,
     },
     {
-      title: "Kanban",
-      href: "/kanban",
-      icon: <FiGrid className="w-5 h-5" />,
+      title: "Websites",
+      href: "/websites",
+      icon: <FiGlobe className="w-5 h-5" />,
+    },
+    {
+      title: "Pages",
+      href: "/pages",
+      icon: <FiFileText className="w-5 h-5" />,
+    },
+    {
+      title: "Templates",
+      href: "/templates",
+      icon: <FiLayout className="w-5 h-5" />,
+    },
+    {
+      title: "SEO",
+      href: "/seo",
+      icon: <FiSearch className="w-5 h-5" />,
       badge: {
         text: "Pro",
         variant: "secondary",
       },
     },
     {
-      title: "Inbox",
-      href: "/inbox",
-      icon: <FiMail className="w-5 h-5" />,
+      title: "Domains",
+      href: "/domains",
+      icon: <FiLink className="w-5 h-5" />,
       badge: {
-        text: "3",
-        variant: "primary",
+        text: "Pro",
+        variant: "secondary",
       },
     },
     {
-      title: "Users",
-      href: "/users",
-      icon: <FiUsers className="w-5 h-5" />,
+      title: "Analytics",
+      href: "/analytics",
+      icon: <FiBarChart2 className="w-5 h-5" />,
     },
     {
-      title: "Products",
-      href: "/products",
-      icon: <FiShoppingBag className="w-5 h-5" />,
+      title: "Media",
+      href: "/media",
+      icon: <FiImage className="w-5 h-5" />,
     },
     {
-      title: "Sign In",
-      href: "/signin",
-      icon: <FiLogIn className="w-5 h-5" />,
-    },
-    {
-      title: "Sign Up",
-      href: "/signup",
-      icon: <FiUserPlus className="w-5 h-5" />,
-    },
+      title: "Settings",
+      href: "/settings",
+      icon: <FiSettings className="w-5 h-5" />,
+    }
   ];
 
-  // User dropdown menu items
-  const userMenuItems: UserMenuItem[] = [
-    { title: "Dashboard", href: "/dashboard" },
-    { title: "Settings", href: "/settings" },
-    { title: "Earnings", href: "/earnings" },
-    { title: "Sign out", href: "/signout" },
-  ];
+
 
   const renderBadge = (badge: MenuItem["badge"]) => {
     if (!badge) return null;
@@ -128,7 +140,7 @@ const SideBar: React.FC<SideBarProps> = ({ children }) => {
 
   return (
     <>
-      <nav className="fixed top-0 z-50 w-full border-b  bg-gray-800 border-gray-700">
+      <nav className="fixed top-0 z-50 w-full border-b  bg-black border-gray-700">
         <div className="px-3 py-3 lg:px-5 lg:pl-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center justify-start rtl:justify-end">
@@ -138,53 +150,7 @@ const SideBar: React.FC<SideBarProps> = ({ children }) => {
             </div>
             <div className="flex items-center">
               <div className="flex gap-2 items-center ms-3">
-                <div className="relative">
-                  <button
-                    type="button"
-                    className="flex text-sm bg-gray-800 rounded-full focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
-                    aria-expanded="false"
-                    data-dropdown-toggle="dropdown-user"
-                  >
-                    <span className="sr-only">Open user menu</span>
-                    <img
-                      className="w-8 h-8 rounded-full"
-                      src="/api/placeholder/32/32"
-                      alt="user photo"
-                    />
-                  </button>
-                </div>
-                <div
-                  className="z-50 hidden my-4 text-base list-none bg-white divide-y divide-gray-100 rounded-sm shadow-sm dark:bg-gray-700 dark:divide-gray-600"
-                  id="dropdown-user"
-                >
-                  <div className="px-4 py-3" role="none">
-                    <p
-                      className="text-sm text-gray-900 dark:text-white"
-                      role="none"
-                    >
-                      User Name
-                    </p>
-                    <p
-                      className="text-sm font-medium text-gray-900 truncate dark:text-gray-300"
-                      role="none"
-                    >
-                      user.email@example.com
-                    </p>
-                  </div>
-                  <ul className="py-1" role="none">
-                    {userMenuItems.map((item, index) => (
-                      <li key={`user-menu-${index}`}>
-                        <Link
-                          href={item.href}
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white"
-                          role="menuitem"
-                        >
-                          {item.title}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+                <UserAvatar/>
                 <button
                   onClick={toggleMobileMenu}
                   data-drawer-target="logo-sidebar"
@@ -196,7 +162,7 @@ const SideBar: React.FC<SideBarProps> = ({ children }) => {
                 >
                   <span className="sr-only">Open sidebar</span>
                   <FiMenu className="w-6 h-6" />
-                </button>
+                </button> 
               </div>
             </div>
           </div>
@@ -207,10 +173,10 @@ const SideBar: React.FC<SideBarProps> = ({ children }) => {
         id="logo-sidebar"
         className={`fixed top-0 left-0 z-40 w-52 h-screen pt-20 transition-transform ${
           isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
-        }  border-r  sm:translate-x-0 bg-gray-800 border-gray-700`}
+        }  border-r  sm:translate-x-0 bg-black border-gray-700`}
         aria-label="Sidebar"
       >
-        <div className="h-full px-3 pb-4 overflow-y-auto bg-gray-800">
+        <div className="h-full px-3 pb-4 overflow-y-auto overflow-x-hidden bg-black">
           <ul className="space-y-2 font-medium">
             {menuItems.map((item, index) => (
               <li key={`sidebar-item-${index}`}>

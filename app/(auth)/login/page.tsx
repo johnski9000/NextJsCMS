@@ -15,10 +15,12 @@ import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { motion, AnimatePresence } from "framer-motion";
 import { signInWithEmail } from "@/lib/supabase/auth";
+import { useRouter } from "next/navigation";
 
 const LoginPage = () => {
   const [loading, setLoading] = useState(false);
   const [showEmailForm, setShowEmailForm] = useState(false);
+  const router = useRouter();
 
   const form = useForm({
     initialValues: {
@@ -51,6 +53,7 @@ const LoginPage = () => {
         message: "Redirecting to dashboard...",
         color: "green",
       });
+      router.push("/dashboard"); // Redirect to dashboard
 
       // Redirect would happen here
     } catch (error) {
@@ -65,11 +68,10 @@ const LoginPage = () => {
   };
 
   return (
-    <main className="font-inter h-full pt-20 md:pt-0 text-white">
-      <section className="pt-10">
+    <main className="font-inter h-full  text-white">
         <div className="grid lg:grid-cols-2 grid-cols-1">
           <div className="flex items-center justify-center lg:mb-0 mb-14 relative">
-            <div className="max-w-md w-full px-4 z-10">
+            <div className="max-w-md w-full p-8 z-10">
               <div className="flex justify-center mb-7 lg:mb-11">
                 <Image
                   src="/mobileLogo.png"
@@ -199,7 +201,7 @@ const LoginPage = () => {
           </div>
 
           {/* Right side image with fade effect */}
-          <div className="hidden lg:block relative h-screen">
+          <div className="hidden lg:block relative min-h-screen">
             <div className="absolute inset-0 bg-gradient-to-r from-black to-transparent z-10" />
             <Image
               src="/login-bg.webp"
@@ -210,7 +212,6 @@ const LoginPage = () => {
             />
           </div>
         </div>
-      </section>
     </main>
   );
 };

@@ -1,82 +1,219 @@
 "use client";
-import { useState } from "react";
-
-import {
-  Button,
-  TextInput,
-  PasswordInput,
-  Paper,
-  Title,
-  Text,
-  Anchor,
-  Alert,
-  Box,
-} from "@mantine/core";
+import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import {
+  TextInput,
+  Button,
+  PasswordInput,
+  LoadingOverlay,
+} from "@mantine/core";
+import { FcGoogle } from "react-icons/fc";
+import { FaFacebook } from "react-icons/fa";
+import { MdEmail } from "react-icons/md";
+import { useForm } from "@mantine/form";
+import { notifications } from "@mantine/notifications";
+import { motion, AnimatePresence } from "framer-motion";
+import { signInWithEmail, signUpWithEmail } from "@/lib/supabase/auth";
+import { useRouter } from "next/navigation";
 
-export default function SignupPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+const LoginPage = () => {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [showEmailForm, setShowEmailForm] = useState(false);
+  const router = useRouter();
+
+  const form = useForm({
+    initialValues: {
+      email: "",
+      password: "",
+    },
+    validate: {
+      email: (value) => (/^\S+@\S+$/.test(value) ? null : "Invalid email"),
+      password: (value) =>
+        value.length >= 6 ? null : "Password must be at least 6 characters",
+    },
+  });
+
+  const handleEmailLogin = async (values) => {
+    setLoading(true);
+    try {
+      // Simulate API call
+      const response = await signUpWithEmail(values.email, values.password);
+      if (!response) {
+        notifications.show({
+          title: "Login failed",
+          message: "Invalid email or password",
+          color: "red",
+        });
+      }
+      console.log("Login response:", response);
+      // Simulate successful login (in real app, check response status)
+      notifications.show({
+        title: "Login successful",
+        message: "Redirecting to dashboard...",
+        color: "green",
+      });
+      router.push("/dashboard"); // Redirect to dashboard
+
+      // Redirect would happen here
+    } catch (error) {
+      notifications.show({
+        title: "Login failed",
+        message: error?.message || "Please try again later",
+        color: "red",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <Box className="bg-black h-screen w-screen flex flex-col items-center justify-center">
-      <Title c="orange">
-        <Link href="/">
-          <Image src="/mobileLogo.png" alt="Logo" width={100} height={100} />
-        </Link>
-      </Title>
-      {error && (
-        <Alert color="red" mt={10} radius="md">
-          {error}
-        </Alert>
-      )}
-      <Paper
-        withBorder
-        shadow="md"
-        p={30}
-        mt={20}
-        radius="md"
-        className="!bg-gray-900 border-orange-500"
-      >
-        <form onSubmit={() => {}}>
-          <TextInput
-            label="Email Address"
-            placeholder="Enter your email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className="text-white"
+    <main className="font-inter h-full  text-white">
+      <div className="grid lg:grid-cols-2 grid-cols-1">
+        <div className="flex items-center justify-center lg:mb-0 mb-14 relative">
+          <div className="max-w-md w-full p-8 z-10">
+            <div className="flex justify-center mb-7 lg:mb-11">
+              <Image
+                src="/mobileLogo.png"
+                alt="Pagedone logo"
+                width={100}
+                height={50}
+                className="object-contain " // Invert colors for dark theme
+              />
+            </div>
+
+            <h2 className="text-white text-center text-2xl font-bold font-manrope leading-9 mb-3">
+              Welcome Back
+            </h2>
+
+            <p className="text-gray-400 text-center text-base font-medium leading-6 mb-11">
+              Let&apos;s get started with your 30 days free trial
+            </p>
+
+            <AnimatePresence mode="wait">
+              {!showEmailForm ? (
+                <motion.div
+                  key="socialButtons"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="space-y-5 mb-11"
+                >
+                  <Button
+                    fullWidth
+                    size="md"
+                    variant="outline"
+                    color="gray"
+                    radius="xl"
+                    leftSection={<FcGoogle size={20} />}
+                    className="hover:bg-gray-800"
+                  >
+                    Sign up with Google
+                  </Button>
+
+                  <Button
+                    fullWidth
+                    size="md"
+                    variant="outline"
+                    color="gray"
+                    radius="xl"
+                    leftSection={<FaFacebook size={20} color="#1877F2" />}
+                    className="hover:bg-gray-800"
+                  >
+                    Sign up with Facebook
+                  </Button>
+
+                  <Button
+                    fullWidth
+                    size="md"
+                    variant="outline"
+                    color="gray"
+                    radius="xl"
+                    leftSection={<MdEmail size={20} />}
+                    className="hover:bg-gray-800"
+                    onClick={() => setShowEmailForm(true)}
+                  >
+                    Sign up with Email
+                  </Button>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="emailForm"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  className="mb-8 relative"
+                >
+                  <LoadingOverlay
+                    visible={loading}
+                    overlayProps={{ blur: 2 }}
+                  />
+                  <form onSubmit={form.onSubmit(handleEmailLogin)}>
+                    <TextInput
+                      label="Email"
+                      placeholder="your@email.com"
+                      className="mb-4"
+                      radius="md"
+                      {...form.getInputProps("email")}
+                    />
+                    <PasswordInput
+                      label="Password"
+                      placeholder="Your password"
+                      className="mb-6"
+                      radius="md"
+                      {...form.getInputProps("password")}
+                    />
+                    <Button
+                      type="submit"
+                      fullWidth
+                      color="orange"
+                      size="md"
+                      radius="xl"
+                      className="mb-4 "
+                    >
+                      Sign Up
+                    </Button>
+                    <Button
+                      variant="subtle"
+                      fullWidth
+                      size="md"
+                      onClick={() => setShowEmailForm(false)}
+                    >
+                      Back to sign up options
+                    </Button>
+                  </form>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            <div className="text-center">
+              <p className="text-gray-300 text-base font-medium leading-6">
+                Already have an account?{" "}
+                <Link
+                  href="/signup"
+                  className="text-orange-400 font-semibold hover:underline"
+                >
+                  Sign In
+                </Link>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Right side image with fade effect */}
+        <div className="hidden lg:block relative min-h-screen">
+          <div className="absolute inset-0 bg-gradient-to-r from-black to-transparent z-10" />
+          <Image
+            src="/login-bg.webp"
+            alt="Curve design image"
+            fill
+            className="object-cover"
+            priority
           />
-          <PasswordInput
-            label="Password"
-            placeholder="Enter your password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            mt="md"
-            className="text-white"
-          />
-          <Button
-            type="submit"
-            fullWidth
-            color="orange"
-            loading={loading}
-            mt="md"
-            className="bg-orange-500 hover:bg-orange-600 text-black"
-          >
-            Sign Up
-          </Button>
-        </form>
-        <Text className="text-center" size="sm" mt="md" c="white">
-          Already have an account?{" "}
-          <Anchor href="/login" c="orange">
-            Log in here
-          </Anchor>
-        </Text>
-      </Paper>
-    </Box>
+        </div>
+      </div>
+    </main>
   );
-}
+};
+
+export default LoginPage;

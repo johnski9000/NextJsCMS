@@ -3,7 +3,7 @@ import { getUserWebsites, getUserStats } from "@/lib/supabase/data-utils";
 import { QuickStatsGrid } from "./QuickStats";
 import WebsiteGrid from "./WebsiteGrid";
 import { redirect } from "next/navigation";
-import { getSession } from "@/lib/supabase/session_server";
+import { getSession } from "@/lib/supabase/data-utils";
 
 export default async function DashboardPage() {
   const session = await getSession();

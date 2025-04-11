@@ -1,6 +1,24 @@
 // lib/data-utils.ts
 import { createClient } from "@/lib/supabase/server";
-import { getCurrentUser } from "./session_server";
+
+export async function getSession() {
+  const supabase = await createClient();
+  const {
+    data: { session },
+    error,
+  } = await supabase.auth.getSession();
+
+  if (error) {
+    console.error("Error fetching session:", error);
+    return null;
+  }
+
+  return session;
+}
+export async function getCurrentUser() {
+  const session = await getSession();
+  return session?.user ?? null;
+}
 
 export async function getUserWebsites() {
   const supabase = await createClient();

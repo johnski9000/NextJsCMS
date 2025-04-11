@@ -69,149 +69,149 @@ const LoginPage = () => {
 
   return (
     <main className="font-inter h-full  text-white">
-        <div className="grid lg:grid-cols-2 grid-cols-1">
-          <div className="flex items-center justify-center lg:mb-0 mb-14 relative">
-            <div className="max-w-md w-full p-8 z-10">
-              <div className="flex justify-center mb-7 lg:mb-11">
-                <Image
-                  src="/mobileLogo.png"
-                  alt="Pagedone logo"
-                  width={100}
-                  height={50}
-                  className="object-contain " // Invert colors for dark theme
-                />
-              </div>
+      <div className="grid lg:grid-cols-2 grid-cols-1">
+        <div className="flex items-center justify-center lg:mb-0 mb-14 relative">
+          <div className="max-w-md w-full p-8 z-10">
+            <div className="flex justify-center mb-7 lg:mb-11">
+              <Image
+                src="/mobileLogo.png"
+                alt="Pagedone logo"
+                width={100}
+                height={50}
+                className="object-contain " // Invert colors for dark theme
+              />
+            </div>
 
-              <h2 className="text-white text-center text-2xl font-bold font-manrope leading-9 mb-3">
-                Welcome Back
-              </h2>
+            <h2 className="text-white text-center text-2xl font-bold font-manrope leading-9 mb-3">
+              Welcome Back
+            </h2>
 
-              <p className="text-gray-400 text-center text-base font-medium leading-6 mb-11">
-                Let's get started with your 30 days free trial
-              </p>
+            <p className="text-gray-400 text-center text-base font-medium leading-6 mb-11">
+              Let&apos;s get started with your 30 days free trial
+            </p>
 
-              <AnimatePresence mode="wait">
-                {!showEmailForm ? (
-                  <motion.div
-                    key="socialButtons"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="space-y-5 mb-11"
+            <AnimatePresence mode="wait">
+              {!showEmailForm ? (
+                <motion.div
+                  key="socialButtons"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="space-y-5 mb-11"
+                >
+                  <Button
+                    fullWidth
+                    size="md"
+                    variant="outline"
+                    color="gray"
+                    radius="xl"
+                    leftSection={<FcGoogle size={20} />}
+                    className="hover:bg-gray-800"
                   >
-                    <Button
-                      fullWidth
-                      size="md"
-                      variant="outline"
-                      color="gray"
-                      radius="xl"
-                      leftSection={<FcGoogle size={20} />}
-                      className="hover:bg-gray-800"
-                    >
-                      Sign in with Google
-                    </Button>
+                    Sign in with Google
+                  </Button>
 
-                    <Button
-                      fullWidth
-                      size="md"
-                      variant="outline"
-                      color="gray"
-                      radius="xl"
-                      leftSection={<FaFacebook size={20} color="#1877F2" />}
-                      className="hover:bg-gray-800"
-                    >
-                      Sign in with Facebook
-                    </Button>
-
-                    <Button
-                      fullWidth
-                      size="md"
-                      variant="outline"
-                      color="gray"
-                      radius="xl"
-                      leftSection={<MdEmail size={20} />}
-                      className="hover:bg-gray-800"
-                      onClick={() => setShowEmailForm(true)}
-                    >
-                      Sign in with Email
-                    </Button>
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    key="emailForm"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    className="mb-8 relative"
+                  <Button
+                    fullWidth
+                    size="md"
+                    variant="outline"
+                    color="gray"
+                    radius="xl"
+                    leftSection={<FaFacebook size={20} color="#1877F2" />}
+                    className="hover:bg-gray-800"
                   >
-                    <LoadingOverlay
-                      visible={loading}
-                      overlayProps={{ blur: 2 }}
+                    Sign in with Facebook
+                  </Button>
+
+                  <Button
+                    fullWidth
+                    size="md"
+                    variant="outline"
+                    color="gray"
+                    radius="xl"
+                    leftSection={<MdEmail size={20} />}
+                    className="hover:bg-gray-800"
+                    onClick={() => setShowEmailForm(true)}
+                  >
+                    Sign in with Email
+                  </Button>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="emailForm"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  className="mb-8 relative"
+                >
+                  <LoadingOverlay
+                    visible={loading}
+                    overlayProps={{ blur: 2 }}
+                  />
+                  <form onSubmit={form.onSubmit(handleEmailLogin)}>
+                    <TextInput
+                      label="Email"
+                      placeholder="your@email.com"
+                      className="mb-4"
+                      radius="md"
+                      {...form.getInputProps("email")}
                     />
-                    <form onSubmit={form.onSubmit(handleEmailLogin)}>
-                      <TextInput
-                        label="Email"
-                        placeholder="your@email.com"
-                        className="mb-4"
-                        radius="md"
-                        {...form.getInputProps("email")}
-                      />
-                      <PasswordInput
-                        label="Password"
-                        placeholder="Your password"
-                        className="mb-6"
-                        radius="md"
-                        {...form.getInputProps("password")}
-                      />
-                      <Button
-                        type="submit"
-                        fullWidth
-                        size="md"
-                        radius="xl"
-                        color="indigo"
-                        className="mb-4"
-                      >
-                        Sign In
-                      </Button>
-                      <Button
-                        variant="subtle"
-                        fullWidth
-                        size="md"
-                        onClick={() => setShowEmailForm(false)}
-                      >
-                        Back to sign in options
-                      </Button>
-                    </form>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                    <PasswordInput
+                      label="Password"
+                      placeholder="Your password"
+                      className="mb-6"
+                      radius="md"
+                      {...form.getInputProps("password")}
+                    />
+                    <Button
+                      type="submit"
+                      fullWidth
+                      size="md"
+                      radius="xl"
+                      color="indigo"
+                      className="mb-4"
+                    >
+                      Sign In
+                    </Button>
+                    <Button
+                      variant="subtle"
+                      fullWidth
+                      size="md"
+                      onClick={() => setShowEmailForm(false)}
+                    >
+                      Back to sign in options
+                    </Button>
+                  </form>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
-              <div className="text-center">
-                <p className="text-gray-300 text-base font-medium leading-6">
-                  Don't have an account?{" "}
-                  <Link
-                    href="/signup"
-                    className="text-indigo-400 font-semibold hover:underline"
-                  >
-                    Sign Up
-                  </Link>
-                </p>
-              </div>
+            <div className="text-center">
+              <p className="text-gray-300 text-base font-medium leading-6">
+                Don&apos;t have an account?{" "}
+                <Link
+                  href="/signup"
+                  className="text-indigo-400 font-semibold hover:underline"
+                >
+                  Sign Up
+                </Link>
+              </p>
             </div>
           </div>
-
-          {/* Right side image with fade effect */}
-          <div className="hidden lg:block relative min-h-screen">
-            <div className="absolute inset-0 bg-gradient-to-r from-black to-transparent z-10" />
-            <Image
-              src="/login-bg.webp"
-              alt="Curve design image"
-              fill
-              className="object-cover"
-              priority
-            />
-          </div>
         </div>
+
+        {/* Right side image with fade effect */}
+        <div className="hidden lg:block relative min-h-screen">
+          <div className="absolute inset-0 bg-gradient-to-r from-black to-transparent z-10" />
+          <Image
+            src="/login-bg.webp"
+            alt="Curve design image"
+            fill
+            className="object-cover"
+            priority
+          />
+        </div>
+      </div>
     </main>
   );
 };

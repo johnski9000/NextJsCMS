@@ -32,6 +32,14 @@ export async function updateSession(request: NextRequest) {
   // List of allowed paths without authentication
   const publicPaths = ["/login", "/signup", "/"];
 
+  if (
+    (user && request.nextUrl.pathname === "/login") ||
+    request.nextUrl.pathname === "/signup"
+  ) {
+    const redirectUrl = new URL("/dashboard", request.url);
+    return NextResponse.redirect(redirectUrl);
+  }
+
   const isPublicPath = publicPaths.some((path) =>
     new RegExp(`^${path.replace(/\*/g, ".*")}$`).test(request.nextUrl.pathname)
   );

@@ -1,7 +1,6 @@
 "use client";
 import { useState } from "react";
-import { signIn } from "next-auth/react";
-import { useRouter, useSearchParams } from "next/navigation";
+
 import {
   Button,
   TextInput,
@@ -21,9 +20,6 @@ export default function SignupPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const selectedPlan = searchParams.get("plan");
 
   return (
     <Box className="bg-black h-screen w-screen flex flex-col items-center justify-center">

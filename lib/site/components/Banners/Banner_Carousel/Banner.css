@@ -1,0 +1,61 @@
+.content-box {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.5s ease;
+}
+
+.content-box.animate {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.inner h4 {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.5s ease;
+  color: green;
+}
+.inner h1 {
+  color: white;
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: all 0.5s ease;
+}
+.inner .text {
+  color: white;
+
+  opacity: 0;
+  transform: translateX(-20px);
+  transition: all 0.5s ease;
+}
+.inner .link-box {
+  color: white;
+
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.5s ease;
+}
+
+.content-box.animate h4 {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0.2s;
+}
+
+.content-box.animate h1 {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0.4s;
+}
+
+.content-box.animate .text {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0.6s;
+}
+
+.content-box.animate .link-box {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0.8s;
+}
